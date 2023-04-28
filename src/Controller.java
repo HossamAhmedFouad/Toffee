@@ -5,8 +5,10 @@ import Products.Inventory;
 import Products.Product;
 import UserData.Info;
 import UserData.Manager;
+import UserData.Order;
 import UserData.User;
 
+import java.sql.Date;
 import java.util.Scanner;
 
 public class Controller {
@@ -97,8 +99,25 @@ public class Controller {
                                                 payment = new Ewallet();
                                                 break;
                                             }
+                                            if(activeUser.getUserCart().checkOut(payment)){
+                                                System.out.println("total price: "+activeUser.getUserCart().getTotalPrice());
+                                                System.out.println("DO YOU WANT TO CONFIRM? (YES):(NO)");
+                                                String answer=scanner.nextLine();
+                                                if(answer=="YES"){
+                                                    Date today = new Date(System.currentTimeMillis());
+                                                    Order order=new Order(activeUser.getUserCart().getTotalPrice(), today, activeUser.getUserInfo().getAddress(), activeUser.getUserCart().getProducts(), payment);
+                                                    activeUser.getOrders().addOrder(order);
+                                                    activeUser.getUserCart().emptyCart();
+                                                    System.out.println("checkOut successfully");
+                                                    break;
+                                                }
+                                            }else{
+                                                System.out.println("error in payment");
+    
+                                            }
                                         }
-                                        activeUser.getUserCart().checkOut(payment,activeUser.getUserInfo().getAddress());
+
+                                        
                                         //TODO : Start payment mode
                                     }else if(choice==5){
                                         break;

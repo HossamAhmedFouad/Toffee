@@ -4,6 +4,7 @@ import PaymentSystem.Payment;
 import Products.Product;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 public class Order {
@@ -11,10 +12,10 @@ public class Order {
     private double totalPrice;
     private Date date;
     private String shipAddress;
-    private List<Product> products;
+    private HashMap<Product,Integer> products = new HashMap<Product, Integer>();
     private Payment payment;
 
-    public Order(double totalPrice, Date date, String shipAddress, List<Product> products, Payment payment) {
+    public Order(double totalPrice, Date date, String shipAddress, HashMap<Product,Integer>  products, Payment payment) {
         this.totalPrice = totalPrice;
         this.date = date;
         this.shipAddress = shipAddress;
@@ -46,11 +47,11 @@ public class Order {
         this.shipAddress = shipAddress;
     }
 
-    public List<Product> getProducts() {
+    public HashMap<Product,Integer>  getProducts() {
         return products;
     }
 
-    public void setProducts(List<Product> products) {
+    public void setProducts(HashMap<Product,Integer>  products) {
         this.products = products;
     }
 

@@ -79,7 +79,12 @@ public class ShoppingCart {
         totalPrice = 0;
     }
 
-    public void checkOut(Payment payment,String ShippingAddress){
+    public boolean checkOut(Payment payment){
+        if(payment.payOrder()){
+            //empty cart
+            return true;
+        }
+        return false;
         //TODO: checkout and empty cart
     }
 
