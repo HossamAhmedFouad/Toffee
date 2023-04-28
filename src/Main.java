@@ -1,5 +1,9 @@
+import Products.Inventory;
+import UserData.Manager;
+
 public class Main {
     public static void main(String[] args) {
-        System.out.println("Hello world!");
+        Controller controller = new Controller(new Inventory(),new Manager());
+        controller.start();
     }
 }
