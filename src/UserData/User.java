@@ -14,14 +14,9 @@ public class User {
     private List<Voucher>vouchers;
 
 
-//    public User(Info userInfo, Card userCard, boolean accountActive, ShoppingCart shoppingCart, int loyaltyPoints, List<Voucher> vouchers) {
-//        this.userInfo = userInfo;
-//        this.userCard = userCard;
-//        this.accountActive = accountActive;
-//        this.userCart = shoppingCart;
-//        this.loyaltyPoints = loyaltyPoints;
-//        this.vouchers = vouchers;
-//    }
+    public User(Info info){
+        userInfo = info;
+    }
 
     public Info getUserInfo() {
         return userInfo;

@@ -16,9 +16,14 @@ public class Product {
     /**
      * Constructor
      */
-    public Product(String name, double price){
+    public Product(String name, double price,String category,String brand,String unitType,int quantity){
         this.name = name;
         this.price = price;
+        this.category = category;
+        this.brand = brand;
+        this.unitType = unitType;
+        this.quantity = quantity;
+        status = Availability.onSale;
     }
 
     /**

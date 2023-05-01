@@ -136,23 +136,29 @@ public class Controller {
             }else if(choice==2){
                 String name,email,password,shippingAddress;
                 String input;
-                System.out.println("Enter name: "); input = scanner.nextLine(); name = input;
-                System.out.println("Enter email: "); input = scanner.nextLine(); email = input;
-                System.out.println("Enter password: "); input = scanner.nextLine(); password = input;
-                System.out.println("Enter Shipping Address: "); input = scanner.nextLine(); shippingAddress = input;
+                System.out.print("Enter name: "); input = scanner.nextLine(); name = input; scanner.next();
+                System.out.print("Enter email: "); input = scanner.nextLine(); email = input; scanner.next();
+                System.out.print("Enter password: "); input = scanner.nextLine(); password = input; scanner.next();
+                System.out.print("Enter Shipping Address: "); input = scanner.nextLine(); shippingAddress = input;
 
-                //TODO: validate data + generate OTP
-                User user = new User();
-                if(manager.registerUser(user)){
+                Info info = new Info();
+                info.setName(name);
+                info.setEmail(email);
+                info.setPassword(password);
+                info.setAddress(shippingAddress);
+
+                //TODO: validate data + generate OTP from Authenticator
+                if(manager.registerUser(info)){
+
                     System.out.println("Register Has Been Successful, you can login now");
                     System.out.println("Returning back to main menu");
                 }else{
-                    //TODO: show unsuccessful message
+                    System.out.println("Error,Email already used");
                 }
 
             }else if(choice==3){
                 String email,password,input;
-                System.out.println("Enter email: "); input = scanner.nextLine(); email = input;
+                System.out.print("Enter email: "); input = scanner.nextLine(); email = input; scanner.next();
                 System.out.println("Enter password: "); input = scanner.nextLine(); password = input;
                 Info info = new Info();
                 info.setEmail(email);
@@ -162,7 +168,7 @@ public class Controller {
                     activeUser = manager.getUser(info);
                     System.out.println("Login Has Been Successful, Welcome " + activeUser.getUserInfo().getName());
                 }else{
-                    //TODO: show unsuccessful message
+                    System.out.println("Invalid,Credentials");
                 }
             }else if(choice==4){
                 break;

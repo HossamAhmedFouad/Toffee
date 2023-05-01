@@ -8,7 +8,7 @@ public class CashOnDelivery extends Payment {
     @Override
     public boolean payOrder() {
         User user=getUser();
-        if(user.getUserInfo().getAddress().isEmpty()){
+        if(user.getUserInfo().getAddress().isEmpty()){ //
             return false;
         }
 
