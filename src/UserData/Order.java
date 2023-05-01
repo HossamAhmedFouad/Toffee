@@ -1,11 +1,9 @@
 package UserData;
 
-import PaymentSystem.Payment;
 import Products.Product;
 
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 
 public class Order {
 
@@ -13,14 +11,12 @@ public class Order {
     private Date date;
     private String shipAddress;
     private HashMap<Product,Integer> products = new HashMap<Product, Integer>();
-    private Payment payment;
 
-    public Order(double totalPrice, Date date, String shipAddress, HashMap<Product,Integer>  products, Payment payment) {
+    public Order(double totalPrice, Date date, String shipAddress, HashMap<Product,Integer>  products) {
         this.totalPrice = totalPrice;
         this.date = date;
         this.shipAddress = shipAddress;
         this.products = products;
-        this.payment = payment;
     }
 
     public double getTotalPrice() {
@@ -53,14 +49,6 @@ public class Order {
 
     public void setProducts(HashMap<Product,Integer>  products) {
         this.products = products;
-    }
-
-    public Payment getPayment() {
-        return payment;
-    }
-
-    public void setPayment(Payment payment) {
-        this.payment = payment;
     }
 
     public int calcLoyalty(){

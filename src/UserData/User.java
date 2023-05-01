@@ -1,15 +1,16 @@
 package UserData;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
 public class User {
     private Info userInfo;
-    private Card userCard;
-    private boolean accountActive;
-    private ShoppingCart userCart;
+    private Card userCard = new Card();
+    private boolean accountActive = true;
+    private ShoppingCart userCart = new ShoppingCart();
 
-    private PreviousOrders orders;
+    private PreviousOrders orders = new PreviousOrders(new ArrayList<Order>());
     private int loyaltyPoints;
     private List<Voucher>vouchers;
 

@@ -9,6 +9,12 @@ public abstract class Payment {
     private User user;
     private Authenticator auth;
 
+    public Payment(Order order,User user){
+        this.order = order;
+        this.user = user;
+        //TODO initialize authenticator
+    }
+
     public abstract boolean payOrder();
 
     public Order getOrder() {

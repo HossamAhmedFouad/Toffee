@@ -48,12 +48,14 @@ public class Controller {
                     choice = scanner.nextInt();
                     if(choice==1){
                         if(loggedUser){
+                            scanner.nextLine();
                             System.out.println("PLEASE ENTER ITEM NUMBER: ");
                             choice = scanner.nextInt();
                             if(choice<=0 || choice>inventory.getProducts().size()){
-                                activeUser.getUserCart().addProduct(inventory.getProducts().get(choice-1)); //TODO: CHECK QUANTITY AND AVAILABILITY
-                            }else{
                                 System.out.println("INVALID NUMBER");
+                            }else{
+                                System.out.println(inventory.getProducts().get(choice-1));
+                                activeUser.getUserCart().addProduct(inventory.getProducts().get(choice-1)); //TODO: CHECK QUANTITY AND AVAILABILITY
                             }
                         }else{
                             System.out.println("YOU MUST BE A USER TO ADD AN ITEM TO CART");
@@ -86,38 +88,35 @@ public class Controller {
                                         }
                                     }else if(choice==4){
                                         Payment payment = null;
-                                        while (true){
+                                        Date today = new Date(System.currentTimeMillis());
+                                        Order order= new Order(activeUser.getUserCart().getTotalPrice(), today, activeUser.getUserInfo().getAddress(), activeUser.getUserCart().getProducts());
+                                        while (true) {
                                             System.out.println("PLEASE CHOOSE PAYMENT OPTION");
                                             System.out.println("1- Cash On Delivery");
                                             System.out.println("2- EWallet");
                                             choice = scanner.nextInt();
-                                            if(choice==1){
-                                                payment = new CashOnDelivery();
+                                            if (choice == 1) {
+                                                payment = new CashOnDelivery(order,activeUser);
                                                 break;
-                                            }
-                                            else if(choice==2){
-                                                payment = new Ewallet();
+                                            } else if (choice == 2) {
+                                                payment = new Ewallet(order,activeUser);
                                                 break;
-                                            }
-                                            if(activeUser.getUserCart().checkOut(payment)){
-                                                System.out.println("total price: "+activeUser.getUserCart().getTotalPrice());
-                                                System.out.println("DO YOU WANT TO CONFIRM? (YES):(NO)");
-                                                String answer=scanner.nextLine();
-                                                if(answer=="YES"){
-                                                    Date today = new Date(System.currentTimeMillis());
-                                                    Order order=new Order(activeUser.getUserCart().getTotalPrice(), today, activeUser.getUserInfo().getAddress(), activeUser.getUserCart().getProducts(), payment);
-                                                    activeUser.getOrders().addOrder(order);
-                                                    activeUser.getUserCart().emptyCart();
-                                                    System.out.println("checkOut successfully");
-                                                    break;
-                                                }
-                                            }else{
-                                                System.out.println("error in payment");
-    
                                             }
                                         }
-
-                                        
+                                        if(activeUser.getUserCart().checkOut(payment)){
+                                            scanner.nextLine();
+                                            System.out.println("total price: "+activeUser.getUserCart().getTotalPrice());
+                                            System.out.println("DO YOU WANT TO CONFIRM? (YES):(NO)");
+                                            String answer=scanner.nextLine();
+                                            if(answer.equals("YES")){
+                                                activeUser.getOrders().addOrder(order);
+                                                activeUser.getUserCart().emptyCart();
+                                                System.out.println("checkOut successfully");
+                                            }
+                                            break;
+                                        }else{
+                                            System.out.println("error in payment");
+                                        }
                                         //TODO : Start payment mode
                                     }else if(choice==5){
                                         break;
@@ -134,12 +133,12 @@ public class Controller {
                 }
 
             }else if(choice==2){
+                scanner.nextLine();
                 String name,email,password,shippingAddress;
-                String input;
-                System.out.print("Enter name: "); input = scanner.nextLine(); name = input; scanner.next();
-                System.out.print("Enter email: "); input = scanner.nextLine(); email = input; scanner.next();
-                System.out.print("Enter password: "); input = scanner.nextLine(); password = input; scanner.next();
-                System.out.print("Enter Shipping Address: "); input = scanner.nextLine(); shippingAddress = input;
+                System.out.print("Enter name: "); name = scanner.nextLine();
+                System.out.print("Enter email: "); email = scanner.nextLine();
+                System.out.print("Enter password: "); password = scanner.nextLine();
+                System.out.print("Enter Shipping Address: "); shippingAddress = scanner.nextLine();
 
                 Info info = new Info();
                 info.setName(name);
@@ -158,8 +157,9 @@ public class Controller {
 
             }else if(choice==3){
                 String email,password,input;
-                System.out.print("Enter email: "); input = scanner.nextLine(); email = input; scanner.next();
-                System.out.println("Enter password: "); input = scanner.nextLine(); password = input;
+                scanner.nextLine();
+                System.out.print("Enter email: "); input = scanner.nextLine(); email = input;
+                System.out.print("Enter password: "); input = scanner.nextLine(); password = input;
                 Info info = new Info();
                 info.setEmail(email);
                 info.setPassword(password);

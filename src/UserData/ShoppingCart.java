@@ -10,7 +10,7 @@ import java.util.List;
 
 public class ShoppingCart {
     private HashMap<Product,Integer> products = new HashMap<Product, Integer>();
-    private double totalPrice;
+    private double totalPrice=0;
 
     public HashMap<Product, Integer> getProducts() {
         return products;
@@ -90,6 +90,7 @@ public class ShoppingCart {
 
     public void addProduct(Product product){
         products.put(product,products.getOrDefault(product,0)+1);
+        totalPrice+=product.getPrice();
     }
 
     public void display(){
