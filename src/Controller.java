@@ -7,8 +7,11 @@ import UserData.Info;
 import UserData.Manager;
 import UserData.Order;
 import UserData.User;
+import UserData.Voucher;
 
 import java.sql.Date;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class Controller {
@@ -103,12 +106,67 @@ public class Controller {
                                                 break;
                                             }
                                         }
+                                        while (true) {
+                                            System.out.println("PLEASE CHOOSE ACTION");
+                                            System.out.println("1- Cash On Delivery");
+                                            System.out.println("2- EWallet");
+                                            choice = scanner.nextInt();
+                                            if (choice == 1) {
+                                                payment = new CashOnDelivery(order,activeUser);
+                                                break;
+                                            } else if (choice == 2) {
+                                                payment = new Ewallet(order,activeUser);
+                                                break;
+                                            }
+                                        }
+                                        String adress;
+                                        while (true) {
+                                            
+                                            System.out.println("PLEASE CHOOSE adress");
+                                            System.out.println("1- SAME ACOUNT ADRESS");
+                                            System.out.println("2- ADD NEW ADRESS");
+                                            choice = scanner.nextInt();
+                                            if (choice == 1) {
+                                                //todo
+                                                break;
+                                            } else if (choice == 2) {
+                                               //todo
+                                               break;
+                                            }
+                                        }
                                         if(activeUser.getUserCart().checkOut(payment)){
                                             scanner.nextLine();
                                             System.out.println("total price: "+activeUser.getUserCart().getTotalPrice());
+                                            while(true){
+                                                System.out.println("DO YOU WANT TO REEDEM AN VOUCHER? (yes):(NO)");
+                                                String vAnswer=scanner.nextLine();
+                                                if(vAnswer=="YES"){
+                                                    
+                                                    List<Voucher> vouchers = activeUser.getVouchers();
+                                                    if (!vouchers.isEmpty()) {
+                                                    System.out.println("Available vouchers:");
+                                                    for (Voucher voucher : vouchers) {
+                                                        String formattedVoucher = "Voucher Code: " + voucher.getCode() + "\n";
+                                                        formattedVoucher += "Amount: " + voucher.getAmount()+ "\n";
+                                                        System.out.print(formattedVoucher);
+                                                    }
+                                                    System.out.println("PLEASE ENTER VOUCHER NUMBER: ");
+                                                    choice=scanner.nextInt();
+                                                   // order.addVoucher(vouchers.get(choice-1));
+                                                    activeUser.getVouchers().remove(choice-1);
+                                                    } else {
+                                                    System.out.println("No vouchers available.");
+                                                    break;
+                                                    }
+                                                
+                                                }else{
+                                                    break;
+                                                }
+                                            }
+
                                             System.out.println("DO YOU WANT TO CONFIRM? (YES):(NO)");
-                                            String answer=scanner.nextLine();
-                                            if(answer.equals("YES")){
+                                            String cAnswer=scanner.nextLine();
+                                            if(cAnswer.equals("YES")){
                                                 activeUser.getOrders().addOrder(order);
                                                 activeUser.getUserCart().emptyCart();
                                                 System.out.println("checkOut successfully");

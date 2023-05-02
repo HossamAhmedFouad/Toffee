@@ -99,15 +99,22 @@ public class ShoppingCart {
             return;
         }
         int cnt = 1;
-        String space = "     ";
-        System.out.println("#     Name     Quantity");
+        String format = "%-5s %-20s %-5s $%-10s\n";
+        System.out.format(format, "No.", "Product", "Qty", "Price");
         for(Product product : products.keySet()){
-            System.out.println(cnt++ + space + product.getName() + space +  products.get(product));
+            System.out.format(format, cnt++, product.getName(), products.get(product), String.format("%.2f", product.getPrice()*products.get(product)));
         }
+        System.out.format("\n%-25s $%-10.2f\n", "Total Price:", totalPrice);
+    }
+    public void displaySummary(){
+        //todo
     }
 
     public boolean empty(){
         return products.isEmpty();
+    }
+    void addVoucher(Voucher voucher){
+        //todo
     }
 
 }

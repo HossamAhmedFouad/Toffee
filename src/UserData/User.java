@@ -9,7 +9,6 @@ public class User {
     private Card userCard = new Card();
     private boolean accountActive = true;
     private ShoppingCart userCart = new ShoppingCart();
-
     private PreviousOrders orders = new PreviousOrders(new ArrayList<Order>());
     private int loyaltyPoints;
     private List<Voucher>vouchers;

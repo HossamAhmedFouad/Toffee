@@ -2,8 +2,10 @@ package UserData;
 
 import Products.Product;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 
 public class Order {
 
@@ -12,11 +14,14 @@ public class Order {
     private String shipAddress;
     private HashMap<Product,Integer> products = new HashMap<Product, Integer>();
 
+
+    
     public Order(double totalPrice, Date date, String shipAddress, HashMap<Product,Integer>  products) {
         this.totalPrice = totalPrice;
         this.date = date;
         this.shipAddress = shipAddress;
         this.products = products;
+
     }
 
     public double getTotalPrice() {
@@ -34,7 +39,7 @@ public class Order {
     public void setDate(Date date) {
         this.date = date;
     }
-
+  
     public String getShipAddress() {
         return shipAddress;
     }
