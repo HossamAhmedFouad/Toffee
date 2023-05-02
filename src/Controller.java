@@ -53,9 +53,11 @@ public class Controller {
                             choice = scanner.nextInt();
                             if(choice<=0 || choice>inventory.getProducts().size()){
                                 System.out.println("INVALID NUMBER");
-                            }else{
+                            } else {
                                 System.out.println(inventory.getProducts().get(choice-1));
-                                activeUser.getUserCart().addProduct(inventory.getProducts().get(choice-1)); //TODO: CHECK QUANTITY AND AVAILABILITY
+                                activeUser.getUserCart().addProduct(inventory.getProducts().get(choice - 1));
+                                //TODO: CHECK QUANTITY AND AVAILABILITY
+                                //Done
                             }
                         }else{
                             System.out.println("YOU MUST BE A USER TO ADD AN ITEM TO CART");
@@ -174,6 +176,5 @@ public class Controller {
                 break;
             }
         }
-
     }
 }
