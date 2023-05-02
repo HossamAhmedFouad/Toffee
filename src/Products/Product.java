@@ -90,6 +90,12 @@ public class Product {
     }
 
     public void setQuantity(int quantity) {
+        int prevQuantity = this.quantity;
         this.quantity = quantity;
+        if (this.quantity == 0) {
+            this.status = Availability.outOfStock;
+        } else if (prevQuantity == 0 && this.quantity > 0) {
+            this.status = Availability.notOnSale;
+        }
     }
 }
