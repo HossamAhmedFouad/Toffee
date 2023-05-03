@@ -12,6 +12,7 @@ import java.util.List;
 public class ShoppingCart {
     private HashMap<Product,Integer> products = new HashMap<Product, Integer>();
     private double totalPrice=0;
+    private double discount=0;
 
     public HashMap<Product, Integer> getProducts() {
         return products;
@@ -23,6 +24,12 @@ public class ShoppingCart {
 
     public double getTotalPrice() {
         return totalPrice;
+    }
+    public double getDiscount() {
+        return discount;
+    }
+    public void setDiscount(double discount) {
+        this.discount=discount;
     }
 
     public void setTotalPrice(double totalPrice) {
@@ -115,14 +122,24 @@ public class ShoppingCart {
         System.out.format("\n%-25s $%-10.2f\n", "Total Price:", totalPrice);
     }
     public void displaySummary(){
-        //todo
+        double subTotal = totalPrice;
+        int items=0;
+        double deliveryFee = 20;
+        double orderTotal = subTotal + deliveryFee-discount;
+        for (Product product : products.keySet()) {
+            items+=products.get(product);
+        }
+        System.out.println("Order Summary:");
+        System.out.printf("%-20s%.2f EGP\n", "Sub-total", subTotal);
+        System.out.printf("%-20s%d\n", "Items", items);
+        System.out.printf("%-20s%.2f EGP\n", "Delivery Fee", deliveryFee);
+        if(discount>0){System.out.printf("%-20s%.2f EGP\n", "Delivery Fee", deliveryFee);}
+        System.out.println("Order Total:");
+        System.out.printf("%.2f", orderTotal);
     }
 
     public boolean empty(){
         return products.isEmpty();
-    }
-    void addVoucher(Voucher voucher){
-        //todo
     }
 
 }

@@ -106,7 +106,7 @@ public class Controller {
         while (true) {
             System.out.println("DO YOU WANT TO REDEEM A VOUCHER? (yes):(NO)");
             String vAnswer = scanner.nextLine();
-            if (vAnswer == "YES") {
+            if (vAnswer == "YES"&&activeUser.getUserCart().getTotalPrice()>0) {
                 List<Voucher> vouchers = activeUser.getVouchers();
                 if (!vouchers.isEmpty()) {
                     System.out.println("Available vouchers:");
@@ -117,13 +117,21 @@ public class Controller {
                     }
                     System.out.println("PLEASE ENTER VOUCHER NUMBER: ");
                     choice = scanner.nextInt();
-                    // order.addVoucher(vouchers.get(choice-1));
+                    if(vouchers.get(choice-1).getAmount()>=activeUser.getUserCart().getTotalPrice()){
+                        activeUser.getUserCart().setDiscount(activeUser.getUserCart().getTotalPrice());
+                        vouchers.get(choice-1).setAmount(vouchers.get(choice-1).getAmount()-activeUser.getUserCart().getTotalPrice());
+                    }else{
+                        activeUser.getUserCart().setDiscount(vouchers.get(choice-1).getAmount());
+                        vouchers.remove(choice-1);
+                    }
                     activeUser.getVouchers().remove(choice - 1);
                 } else {
                     System.out.println("No vouchers available.");
                     break;
                 }
-            } else {
+            }else if(activeUser.getUserCart().getTotalPrice()==0){
+                System.out.println("CANT ADD VOUCHER TO YOUR ORDER");
+            }else {
                 break;
             }
         }
