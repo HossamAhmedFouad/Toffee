@@ -42,12 +42,42 @@ public class Controller {
         Info info = new Info(name,email,password,shippingAddress);
 
         //TODO: validate data + generate OTP from Authenticator
-        if (!authenticator.validateInfo(info)) {
-            System.out.println("Register Has Been Successful, you can login now");
-            System.out.println("Returning back to main menu");
-        } else {
-            System.out.println("Error,Email already used");
+        //Done
+        if (authenticator.validateInfo(info)) {
+            System.out.println("Error, Email already used");
+            return;
         }
+        info.setOTP(authenticator.generateOTP());
+        System.out.println("Please enter OTP sent to your email address: " + info.getEmail());
+        String input = scanner.nextLine();
+        while(input != info.getOTP()) {
+            System.out.println("Incorrect OTP...");
+            System.out.println("1 - Resend OTP");
+            System.out.println("2 - Try Again");
+            System.out.println("3 - Change Email Address");
+            System.out.println("4 - Cancel Registration");
+            int choice = scanner.nextInt();
+            scanner.nextLine();
+            if (choice == 3) {
+                System.out.print("Enter email: ");
+                email = scanner.nextLine();
+                info.setEmail(email);
+                choice = 1;
+            }
+            if(choice == 1){
+                info.setOTP(authenticator.generateOTP());
+                System.out.println("Please enter OTP sent to your email address: " + info.getEmail());
+                input = scanner.nextLine();
+            } else if (choice == 2) {
+                input = scanner.nextLine();
+            } else if(choice == 4){
+                return;
+            }
+        }
+        activeUser = new User(info);
+        authenticator.addUser(activeUser, info);
+        System.out.println("Register Has Been Successful, you can login now");
+        System.out.println("Returning back to main menu");
     }
 
     public void changeCartItems(int choice) {
@@ -233,9 +263,9 @@ public class Controller {
                         break;
                     }
                 }
-            } else if (choice == 2) {
+            } else if (choice == 2 && !loggedUser) {
                 register();
-            } else if (choice == 3) {
+            } else if (choice == 3 && !loggedUser) {
                 login();
             } else if (choice == 4) {
                 break;
