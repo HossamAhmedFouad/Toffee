@@ -3,8 +3,8 @@ import PaymentSystem.Ewallet;
 import PaymentSystem.Payment;
 import Products.Inventory;
 import Products.Product;
+import UserData.Authenticator;
 import UserData.Info;
-import UserData.Manager;
 import UserData.Order;
 import UserData.User;
 import UserData.Voucher;
@@ -17,13 +17,13 @@ public class Controller {
     Scanner scanner;
     int choice;
     private Inventory inventory;
-    private Manager manager;
+    private Authenticator authenticator;
     private boolean loggedUser;
     private User activeUser;
 
-    public Controller(Inventory inventory, Manager manager) {
+    public Controller(Inventory inventory, Authenticator authenticator) {
         this.inventory = inventory;
-        this.manager = manager;
+        this.authenticator = authenticator;
         loggedUser = false;
     }
 
@@ -39,14 +39,10 @@ public class Controller {
         System.out.print("Enter Shipping Address: ");
         shippingAddress = scanner.nextLine();
 
-        Info info = new Info();
-        info.setName(name);
-        info.setEmail(email);
-        info.setPassword(password);
-        info.setAddress(shippingAddress);
+        Info info = new Info(name,email,password,shippingAddress);
 
         //TODO: validate data + generate OTP from Authenticator
-        if (manager.registerUser(info)) {
+        if (!authenticator.validateInfo(info)) {
             System.out.println("Register Has Been Successful, you can login now");
             System.out.println("Returning back to main menu");
         } else {
@@ -69,8 +65,10 @@ public class Controller {
     public void displayMenu() {
         System.out.println("WELCOME PLEASE CHOOSE ACTION");
         System.out.println("1 - View Catalog Of Products Available");
-        System.out.println("2 - Register");
-        System.out.println("3 - Log In");
+        if (!loggedUser) {
+            System.out.println("2 - Register");
+            System.out.println("3 - Log In");
+        }
         System.out.println("4 - Exit");
     }
 
@@ -113,9 +111,9 @@ public class Controller {
         Info info = new Info();
         info.setEmail(email);
         info.setPassword(password);
-        if (manager.loginUser(info)) {
+        if (authenticator.validateInfo(info)) {
             loggedUser = true;
-            activeUser = manager.getUser(info);
+            activeUser = authenticator.getUser(info);
             System.out.println("Login Has Been Successful, Welcome " + activeUser.getUserInfo().getName());
         } else {
             System.out.println("Invalid,Credentials");

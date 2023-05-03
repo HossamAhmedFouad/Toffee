@@ -3,12 +3,16 @@ package UserData;
 public class Info {
     private String name,email,password,address;
 
-//    public Info(String name, String email, String password, String address){
-//        this.name = name;
-//        this.email = email;
-//        this.password = password;
-//        this.address = address;
-//    }
+    public Info(String name, String email, String password, String address) {
+        this.name = name;
+        this.email = email;
+        this.password = password;
+        this.address = address;
+    }
+
+    public Info(){
+        
+    }
 
     public String getName() {
         return name;
