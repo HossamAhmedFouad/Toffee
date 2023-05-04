@@ -1,12 +1,13 @@
 package UserData;
 
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 
 
 public class User {
     private Info userInfo;
-    private Card userCard = new Card();
+    private Card userCard;
     private boolean accountActive = true;
     private ShoppingCart userCart = new ShoppingCart();
     private PreviousOrders orders = new PreviousOrders(new ArrayList<Order>());
@@ -30,8 +31,8 @@ public class User {
         return userCard;
     }
 
-    public void setUserCard(Card userCard) {
-        this.userCard = userCard;
+    public void setUserCard(String cardNumber, Date date, int pin) {
+        this.userCard = new Card(cardNumber, date, pin);
     }
 
     public boolean isAccountActive() {

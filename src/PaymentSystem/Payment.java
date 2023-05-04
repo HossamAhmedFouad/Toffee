@@ -6,7 +6,7 @@ import UserData.User;
 
 public abstract class Payment {
     private Order order;
-    private User user;
+    protected User user;
     private Authenticator auth;
 
     public Payment(Order order,User user){

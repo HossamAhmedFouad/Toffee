@@ -58,13 +58,12 @@ public class Controller {
             System.out.println("4 - Cancel Registration");
             int choice = scanner.nextInt();
             scanner.nextLine();
-            if (choice == 3) {
-                System.out.print("Enter email: ");
-                email = scanner.nextLine();
-                info.setEmail(email);
-                choice = 1;
-            }
-            if(choice == 1){
+            if (choice == 1 || choice == 3) {
+                if (choice == 3) {
+                    System.out.print("Enter email: ");
+                    email = scanner.nextLine();
+                    info.setEmail(email);
+                }
                 info.setOTP(authenticator.generateOTP());
                 System.out.println("Please enter OTP sent to your email address: " + info.getEmail());
                 input = scanner.nextLine();
@@ -74,8 +73,8 @@ public class Controller {
                 return;
             }
         }
-        activeUser = new User(info);
-        authenticator.addUser(activeUser, info);
+        authenticator.addUser(info);
+        activeUser = authenticator.getUser(info);
         System.out.println("Register Has Been Successful, you can login now");
         System.out.println("Returning back to main menu");
     }
@@ -106,7 +105,7 @@ public class Controller {
         while (true) {
             System.out.println("DO YOU WANT TO REDEEM A VOUCHER? (yes):(NO)");
             String vAnswer = scanner.nextLine();
-            if (vAnswer == "YES"&&activeUser.getUserCart().getTotalPrice()>0) {
+            if (vAnswer == "YES" && activeUser.getUserCart().getTotalPrice()>0) {
                 List<Voucher> vouchers = activeUser.getVouchers();
                 if (!vouchers.isEmpty()) {
                     System.out.println("Available vouchers:");
@@ -154,14 +153,16 @@ public class Controller {
             activeUser = authenticator.getUser(info);
             System.out.println("Login Has Been Successful, Welcome " + activeUser.getUserInfo().getName());
         } else {
-            System.out.println("Invalid,Credentials");
+            System.out.println("Invalid, Credentials");
         }
     }
 
     public void viewCart() {
         activeUser.getUserCart().display();
-        if (activeUser.getUserCart().empty())
+        if (activeUser.getUserCart().empty()) {
+            System.out.println("Cart is empty!");
             return;
+        }
         while (true) {
             System.out.println("PLEASE CHOOSE ACTION");
             System.out.println("1 - Increase amount");
@@ -177,32 +178,31 @@ public class Controller {
                 Date today = new Date(System.currentTimeMillis());
                 Order order = new Order(activeUser.getUserCart().getTotalPrice(), today,
                         activeUser.getUserInfo().getAddress(), activeUser.getUserCart().getProducts());
-                while (true) {
-                    System.out.println("PLEASE CHOOSE PAYMENT OPTION");
-                    System.out.println("1- Cash On Delivery");
-                    System.out.println("2- EWallet");
-                    choice = scanner.nextInt();
-                    if (choice == 1) {
-                        payment = new CashOnDelivery(order, activeUser);
-                        break;
-                    } else if (choice == 2) {
-                        payment = new Ewallet(order, activeUser);
-                        break;
-                    }
+                //Payment section
+                System.out.println("PLEASE CHOOSE PAYMENT OPTION");
+                System.out.println("1 - Cash On Delivery");
+                System.out.println("2 - EWallet");
+                System.out.println("3 - Back");
+                choice = scanner.nextInt();
+                if (choice == 1) {
+                    payment = new CashOnDelivery(order, activeUser);
+                } else if (choice == 2) {
+                    payment = new Ewallet(order, activeUser);
+                }else if (choice == 3) {
+                    continue;
                 }
+                //Choosing shipping address
                 String address;
-                while (true) {
-                    System.out.println("PLEASE CHOOSE address");
-                    System.out.println("1- SAME ACCOUNT ADDRESS");
-                    System.out.println("2- ADD NEW ADDRESS");
-                    choice = scanner.nextInt();
-                    if (choice == 1) {
-                        //todo
-                        break;
-                    } else if (choice == 2) {
-                        //todo
-                        break;
-                    }
+                System.out.println("PLEASE CHOOSE ADDRESS");
+                System.out.println("1 - Same account address");
+                System.out.println("2 - Add new address");
+                choice = scanner.nextInt();
+                if (choice == 1) {
+                    //Todo
+                    break;
+                } else if (choice == 2) {
+                    //Todo
+                    break;
                 }
                 if (activeUser.getUserCart().checkOut(payment)) {
                     scanner.nextLine();
@@ -213,7 +213,7 @@ public class Controller {
                     if (cAnswer.equals("YES")) {
                         activeUser.getOrders().addOrder(order);
                         activeUser.getUserCart().emptyCart();
-                        System.out.println("checkOut successfully");
+                        System.out.println("Checkout successfully");
                     }
                     break;
                 } else {
@@ -232,12 +232,12 @@ public class Controller {
         choice = scanner.nextInt();
         if (choice <= 0 || choice > inventory.getProducts().size()) {
             System.out.println("INVALID NUMBER");
-        } else {
-            System.out.println(inventory.getProducts().get(choice - 1));
-            activeUser.getUserCart().addProduct(inventory.getProducts().get(choice - 1));
-            //TODO: CHECK QUANTITY AND AVAILABILITY
-            //Done
-        }
+            return;
+        } 
+        System.out.println(inventory.getProducts().get(choice - 1));
+        activeUser.getUserCart().addProduct(inventory.getProducts().get(choice - 1));
+        //TODO: CHECK QUANTITY AND AVAILABILITY
+        //Done
     }
 
     public void start() {
@@ -247,29 +247,26 @@ public class Controller {
             choice = scanner.nextInt();
             if (choice == 1) {
                 inventory.display();
-                while (true) {
-                    System.out.println("PLEASE CHOOSE ACTION");
-                    System.out.println("1 - Add an item to cart");
-                    System.out.println("2 - Go to cart");
-                    System.out.println("3 - Go Back");
-                    choice = scanner.nextInt();
-                    if (choice == 1) {
-                        if (loggedUser) {
-                            addItem();
-                        } else {
-                            System.out.println("YOU MUST BE A USER TO ADD AN ITEM TO CART");
-                            break;
-                        }
-                    } else if (choice == 2) {
-                        if (loggedUser) {
-                            viewCart();
-                        } else {
-                            System.out.println("YOU MUST BE A USER TO ADD AN ITEM TO CART");
-                            break;
-                        }
-                    } else if (choice == 3) {
-                        break;
+                System.out.println("PLEASE CHOOSE ACTION");
+                System.out.println("1 - Add an item to cart");
+                System.out.println("2 - Go to cart");
+                System.out.println("3 - Go Back");
+                choice = scanner.nextInt();
+                if (choice == 1) {
+                    if (loggedUser) {
+                        addItem();
+                    } else {
+                        System.out.println("YOU MUST BE A USER TO ADD AN ITEM TO CART");
+                        continue;
                     }
+                } else if (choice == 2) {
+                    if (loggedUser) {
+                        viewCart();
+                    } else {
+                        System.out.println("YOU MUST BE A USER TO ADD AN ITEM TO CART");
+                    }
+                } else if (choice == 3) {
+                    continue;
                 }
             } else if (choice == 2 && !loggedUser) {
                 register();

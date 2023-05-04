@@ -7,10 +7,9 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.Scanner;
-
+import java.util.Date;
 
 public class Authenticator {
-    private Card card;
     private HashMap<String, User> users = new HashMap<String, User>();
     private String otp;
     private String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -32,6 +31,14 @@ public class Authenticator {
         scanner.close();
     }
 
+    public boolean validateCard(Card card) {
+        Date today = new Date(System.currentTimeMillis());
+        if (!card.getDate().after(today) || card.getStatus() == false) {
+            // Card is not valid or status is inactive
+            return false;
+        }
+        return true;
+    }
     public User getUser(Info info){
         return users.get(info.getEmail());
     }
@@ -42,7 +49,8 @@ public class Authenticator {
         return users.containsKey(info.getEmail());
     }
 
-    public void addUser(User user,Info info) {
+    public void addUser(Info info) {
+        User user = new User(info);
         users.put(info.getEmail(), user);
         try {
             FileWriter myWriter = new FileWriter(System.getProperty("user.dir") + "/src/UserData/users.csv",true);
@@ -69,10 +77,4 @@ public class Authenticator {
         return otp;
     }
 
-    
-    public boolean validateOTP(String otp){
-        //TODO: validates OTP
-        //Done
-        return true;
-    }
 }

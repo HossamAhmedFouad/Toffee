@@ -6,30 +6,28 @@ import java.util.PrimitiveIterator.OfInt;
 public class Card {
     private String cardNumber;
     private Date date;
-    private boolean status;
+    private boolean status = true;
     private int pin;
-    private Authenticator auth;
 
-    public boolean validate(){
-        Date today = new Date(System.currentTimeMillis());
-        if (!date.after(today)) {
-            // Card is not valid
-            return false;
-        }
-        if(status==false){
-            return false;
-        }
-
-        return true;
-
-        //TODO : Validate card data to follow world wide card details
+    public Card(String cardNumber, Date date, int pin) {
+        this.cardNumber = cardNumber;
+        this.date = date;
+        this.pin = pin;
     }
     public void terminate(){
         //TODO: terminate card and make status not active
+        status = false;
     }
 
-    public void update(){
+    public Date getDate() {
+        return date;
+    }
+
+    public void update() {
         // TODO: update card details, may need to take parameters and update uml diagram
+    }
+    public boolean getStatus() {
+        return status;
     }
     public int getPin(){
         return pin;
