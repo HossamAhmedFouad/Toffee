@@ -4,10 +4,7 @@ import PaymentSystem.Payment;
 import Products.Availability;
 import Products.Product;
 
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 
 public class ShoppingCart {
     private HashMap<Product,Integer> products = new HashMap<Product, Integer>();

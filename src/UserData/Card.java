@@ -1,7 +1,6 @@
 package UserData;
 
 import java.util.Date;
-import java.util.PrimitiveIterator.OfInt;
 
 public class Card {
     private String cardNumber;

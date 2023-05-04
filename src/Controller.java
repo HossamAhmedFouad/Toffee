@@ -2,7 +2,6 @@ import PaymentSystem.CashOnDelivery;
 import PaymentSystem.Ewallet;
 import PaymentSystem.Payment;
 import Products.Inventory;
-import Products.Product;
 import UserData.Authenticator;
 import UserData.Info;
 import UserData.Order;
@@ -50,7 +49,8 @@ public class Controller {
         info.setOTP(authenticator.generateOTP());
         System.out.println("Please enter OTP sent to your email address: " + info.getEmail());
         String input = scanner.nextLine();
-        while(input != info.getOTP()) {
+        System.out.println(info.getOTP());
+        while(!input.equals(info.getOTP())) {
             System.out.println("Incorrect OTP...");
             System.out.println("1 - Resend OTP");
             System.out.println("2 - Try Again");
@@ -103,9 +103,9 @@ public class Controller {
 
     public void redeemVoucher() {
         while (true) {
-            System.out.println("DO YOU WANT TO REDEEM A VOUCHER? (yes):(NO)");
+            System.out.println("DO YOU WANT TO REDEEM A VOUCHER? (YES):(NO)");
             String vAnswer = scanner.nextLine();
-            if (vAnswer == "YES" && activeUser.getUserCart().getTotalPrice()>0) {
+            if (vAnswer.equals("YES") && activeUser.getUserCart().getTotalPrice() > 0) {
                 List<Voucher> vouchers = activeUser.getVouchers();
                 if (!vouchers.isEmpty()) {
                     System.out.println("Available vouchers:");
@@ -114,7 +114,7 @@ public class Controller {
                         formattedVoucher += "Amount: " + voucher.getAmount() + "\n";
                         System.out.print(formattedVoucher);
                     }
-                    System.out.println("PLEASE ENTER VOUCHER NUMBER: ");
+                    System.out.println("PLEASE ENTER VOUCHER CODE: ");
                     choice = scanner.nextInt();
                     if(vouchers.get(choice-1).getAmount()>=activeUser.getUserCart().getTotalPrice()){
                         activeUser.getUserCart().setDiscount(activeUser.getUserCart().getTotalPrice());
@@ -199,10 +199,8 @@ public class Controller {
                 choice = scanner.nextInt();
                 if (choice == 1) {
                     //Todo
-                    break;
                 } else if (choice == 2) {
                     //Todo
-                    break;
                 }
                 if (activeUser.getUserCart().checkOut(payment)) {
                     scanner.nextLine();

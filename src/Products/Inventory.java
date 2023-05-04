@@ -1,6 +1,5 @@
 package Products;
 
-import UserData.Info;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -8,28 +7,49 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+import UserData.Voucher;
+
 public class Inventory {
     /**
      * Attributes
      */
+    Scanner scanner;
     private List<Product> products = new ArrayList<Product>();
+    private List<Voucher> vouchers = new ArrayList<Voucher>();
     /**
      * Operations
      */
-    public Inventory(){
-        Scanner scanner;
+    public Inventory() {
+        loadProducts();
+        loadVoucher();
+        scanner.close();
+    }
+
+    public void loadVoucher() {
+        try {
+            scanner = new Scanner(new File(System.getProperty("user.dir") + "/src/Products/vouchers.csv"));
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+        while (scanner.hasNext()) {
+            String line = scanner.nextLine();
+            String[] data = line.split(",", 3);
+            vouchers.add(new Voucher(data[0], Double.parseDouble(data[1])));
+            System.out.println(data[0]+" "+Double.parseDouble(data[1]));
+        }
+    }
+    public void loadProducts() {
         try {
             scanner = new Scanner(new File(System.getProperty("user.dir") + "/src/Products/stock.csv"));
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
         }
-        while (scanner.hasNext()){
+        while (scanner.hasNext()) {
             String line = scanner.nextLine();
-            String[] data = line.split(",",7);
-            products.add(new Product(data[0],Double.parseDouble(data[1]),data[2],data[3],data[4],Integer.parseInt(data[5])));
+            String[] data = line.split(",", 7);
+            products.add(new Product(data[0], Double.parseDouble(data[1]), data[2], data[3], data[4],
+                    Integer.parseInt(data[5])));
         }
-        scanner.close();
-
     }
     public void addProduct(Product product){
         products.add(product);
