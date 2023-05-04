@@ -12,7 +12,7 @@ public class User {
     private ShoppingCart userCart = new ShoppingCart();
     private PreviousOrders orders = new PreviousOrders(new ArrayList<Order>());
     private int loyaltyPoints;
-    private List<Voucher>vouchers;
+    private List<Voucher>vouchers=new ArrayList<Voucher>();
 
 
     public User(Info info){
@@ -73,5 +73,8 @@ public class User {
 
     public void setOrders(PreviousOrders orders) {
         this.orders = orders;
+    }
+    public void addVouchers(Voucher voucher) {
+        this.vouchers.add(voucher);
     }
 }

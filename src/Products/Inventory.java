@@ -35,7 +35,7 @@ public class Inventory {
             String line = scanner.nextLine();
             String[] data = line.split(",", 3);
             vouchers.add(new Voucher(data[0], Double.parseDouble(data[1])));
-            System.out.println(data[0]+" "+Double.parseDouble(data[1]));
+            //System.out.println(data[0]+" "+Double.parseDouble(data[1]));
         }
     }
     public void loadProducts() {
@@ -103,6 +103,9 @@ public class Inventory {
             if(product.getName().equals(name)) found.add(product);
         }
         return found;
+    }
+    public List<Voucher> getVoucher(){
+        return vouchers;
     }
 
 }

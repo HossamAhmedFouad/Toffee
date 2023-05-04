@@ -106,24 +106,22 @@ public class Controller {
             System.out.println("DO YOU WANT TO REDEEM A VOUCHER? (YES):(NO)");
             String vAnswer = scanner.nextLine();
             if (vAnswer.equals("YES") && activeUser.getUserCart().getTotalPrice() > 0) {
-                List<Voucher> vouchers = activeUser.getVouchers();
-                if (!vouchers.isEmpty()) {
+                
+                if (!activeUser.getVouchers().isEmpty()) {
                     System.out.println("Available vouchers:");
-                    for (Voucher voucher : vouchers) {
-                        String formattedVoucher = "Voucher Code: " + voucher.getCode() + "\n";
-                        formattedVoucher += "Amount: " + voucher.getAmount() + "\n";
-                        System.out.print(formattedVoucher);
-                    }
-                    System.out.println("PLEASE ENTER VOUCHER CODE: ");
+                    displayVouchers(activeUser.getVouchers());
+                    System.out.println(activeUser.getVouchers().get(choice-1).getAmount());
+                    System.out.println(activeUser.getUserCart().getTotalPrice());
+                    System.out.println("PLEASE ENTER VOUCHER NUMBER: ");
                     choice = scanner.nextInt();
-                    if(vouchers.get(choice-1).getAmount()>=activeUser.getUserCart().getTotalPrice()){
+                    if(activeUser.getVouchers().get(choice-1).getAmount()>=activeUser.getUserCart().getTotalPrice()){
                         activeUser.getUserCart().setDiscount(activeUser.getUserCart().getTotalPrice());
-                        vouchers.get(choice-1).setAmount(vouchers.get(choice-1).getAmount()-activeUser.getUserCart().getTotalPrice());
+                        activeUser.getVouchers().get(choice-1).setAmount(activeUser.getVouchers().get(choice-1).getAmount()-activeUser.getUserCart().getTotalPrice());
                     }else{
-                        activeUser.getUserCart().setDiscount(vouchers.get(choice-1).getAmount());
-                        vouchers.remove(choice-1);
+                        activeUser.getUserCart().setDiscount(activeUser.getVouchers().get(choice-1).getAmount());
+                        activeUser.getVouchers().remove(choice - 1);
                     }
-                    activeUser.getVouchers().remove(choice - 1);
+                    
                 } else {
                     System.out.println("No vouchers available.");
                     break;
@@ -174,11 +172,22 @@ public class Controller {
             if (choice == 1 || choice == 2 || choice == 3) {
                 changeCartItems(choice);
             } else if (choice == 4) {
+                //Choosing shipping address
+                String address=null;
+                System.out.println("PLEASE CHOOSE ADDRESS");
+                System.out.println("1 - Same account address");
+                System.out.println("2 - Add new address");
+                choice = scanner.nextInt();
+                if (choice == 1) {
+                    address=activeUser.getUserInfo().getAddress();
+                } else if (choice == 2) {
+                    System.out.println("Enter a new address");
+                    address=scanner.nextLine();
+                }
+                //Payment section
                 Payment payment = null;
                 Date today = new Date(System.currentTimeMillis());
-                Order order = new Order(activeUser.getUserCart().getTotalPrice(), today,
-                        activeUser.getUserInfo().getAddress(), activeUser.getUserCart().getProducts());
-                //Payment section
+                Order order = new Order(activeUser.getUserCart().getTotalPrice(), today,address, activeUser.getUserCart().getProducts());
                 System.out.println("PLEASE CHOOSE PAYMENT OPTION");
                 System.out.println("1 - Cash On Delivery");
                 System.out.println("2 - EWallet");
@@ -191,21 +200,11 @@ public class Controller {
                 }else if (choice == 3) {
                     continue;
                 }
-                //Choosing shipping address
-                String address;
-                System.out.println("PLEASE CHOOSE ADDRESS");
-                System.out.println("1 - Same account address");
-                System.out.println("2 - Add new address");
-                choice = scanner.nextInt();
-                if (choice == 1) {
-                    //Todo
-                } else if (choice == 2) {
-                    //Todo
-                }
+                
                 if (activeUser.getUserCart().checkOut(payment)) {
                     scanner.nextLine();
-                    System.out.println("Total price: " + activeUser.getUserCart().getTotalPrice());
                     redeemVoucher();
+                    activeUser.getUserCart().displaySummary();
                     System.out.println("DO YOU WANT TO CONFIRM? (YES):(NO)");
                     String cAnswer = scanner.nextLine();
                     if (cAnswer.equals("YES")) {
@@ -245,10 +244,12 @@ public class Controller {
             choice = scanner.nextInt();
             if (choice == 1) {
                 inventory.display();
+                while(true){
                 System.out.println("PLEASE CHOOSE ACTION");
                 System.out.println("1 - Add an item to cart");
                 System.out.println("2 - Go to cart");
-                System.out.println("3 - Go Back");
+                System.out.println("3 - Buy a voucher");
+                System.out.println("4 - Go Back");
                 choice = scanner.nextInt();
                 if (choice == 1) {
                     if (loggedUser) {
@@ -262,10 +263,15 @@ public class Controller {
                         viewCart();
                     } else {
                         System.out.println("YOU MUST BE A USER TO ADD AN ITEM TO CART");
+                        continue;
                     }
-                } else if (choice == 3) {
-                    continue;
+                }else if(choice == 3){
+                    buyVoucehr();
+                    displayVouchers(activeUser.getVouchers());
+                }else if (choice == 4) {
+                    break;
                 }
+            }
             } else if (choice == 2 && !loggedUser) {
                 register();
             } else if (choice == 3 && !loggedUser) {
@@ -275,4 +281,31 @@ public class Controller {
             }
         }
     }
+    public void displayVouchers(List<Voucher> vouchers) {
+
+            if (vouchers.isEmpty()) {
+                System.out.println("No vouchers available.");
+                return;
+            }
+            int cnt = 1;
+            String format = "%-5s %-20s $%-10s\n";
+            System.out.format(format, "No.", "Voucher Code", "Amount");
+            for (Voucher voucher : vouchers) {
+                System.out.format(format, cnt++, voucher.getCode(), String.format("%.2f", voucher.getAmount()));
+            }
+    }
+    public void buyVoucehr(){
+        while(true){
+            displayVouchers(inventory.getVoucher());
+            choice=scanner.nextInt();
+            if(choice>=0&&choice<=inventory.getVoucher().size()){
+                activeUser.addVouchers(inventory.getVoucher().get(choice-1));
+                inventory.getVoucher().remove(choice-1);
+                break;
+            }else{
+                continue;
+            }
+        }
+    }
+
 }

@@ -104,7 +104,7 @@ public class ShoppingCart {
         products.put(product, products.getOrDefault(product, 0) + 1);
         totalPrice += product.getPrice();
     }
-
+    //this two fun can put in controller instead of here
     public void display(){
         if(products.isEmpty()){
             System.out.println("Cart Is Empty");
@@ -130,9 +130,9 @@ public class ShoppingCart {
         System.out.printf("%-20s%.2f EGP\n", "Sub-total", subTotal);
         System.out.printf("%-20s%d\n", "Items", items);
         System.out.printf("%-20s%.2f EGP\n", "Delivery Fee", deliveryFee);
-        if(discount>0){System.out.printf("%-20s%.2f EGP\n", "Delivery Fee", deliveryFee);}
-        System.out.println("Order Total:");
-        System.out.printf("%.2f", orderTotal);
+        if(discount>0){System.out.printf("%-20s%.2f EGP\n", "Discount: ", discount);}
+        System.out.println("Order Total:"); 
+        System.out.printf("%.2f\n", orderTotal);
     }
 
     public boolean empty(){
