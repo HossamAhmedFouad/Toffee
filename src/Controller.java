@@ -256,17 +256,15 @@ public class Controller {
                         addItem();
                     } else {
                         System.out.println("YOU MUST BE A USER TO ADD AN ITEM TO CART");
-                        continue;
                     }
                 } else if (choice == 2) {
                     if (loggedUser) {
                         viewCart();
                     } else {
                         System.out.println("YOU MUST BE A USER TO ADD AN ITEM TO CART");
-                        continue;
                     }
                 }else if(choice == 3){
-                    buyVoucehr();
+                    buyVoucher();
                     displayVouchers(activeUser.getVouchers());
                 }else if (choice == 4) {
                     break;
@@ -294,7 +292,7 @@ public class Controller {
                 System.out.format(format, cnt++, voucher.getCode(), String.format("%.2f", voucher.getAmount()));
             }
     }
-    public void buyVoucehr(){
+    public void buyVoucher(){
         while(true){
             displayVouchers(inventory.getVoucher());
             choice=scanner.nextInt();
@@ -302,8 +300,6 @@ public class Controller {
                 activeUser.addVouchers(inventory.getVoucher().get(choice-1));
                 inventory.getVoucher().remove(choice-1);
                 break;
-            }else{
-                continue;
             }
         }
     }

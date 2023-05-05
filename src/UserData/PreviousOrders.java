@@ -22,7 +22,7 @@ public class PreviousOrders {
     }
 
     public void displayOrder(Order order){
-        //TODO: display order details
+        //TODO: display order details -- Discount Dilemma
     }
 
     public void viewOrders(){

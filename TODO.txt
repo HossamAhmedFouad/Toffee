@@ -1,0 +1,15 @@
+1 - Fixing loading from CSV using System Dir -- Adel Currently
+
+2 - Calculating Loyalty Points On Orders -- Atef
+
+3 - Order show paid price with discounted price -- Hossam
+
+4 - Reorder -- Hossam
+
+5 - Admin Skills -- Hossam
+
+6 - Send Email OTP (Yarab) -- Adel
+
+7 - Clean The Code -- Adel
+
+8 - Regex -- Adel

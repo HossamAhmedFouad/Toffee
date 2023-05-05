@@ -33,7 +33,7 @@ public class Authenticator {
 
     public boolean validateCard(Card card) {
         Date today = new Date(System.currentTimeMillis());
-        if (!card.getDate().after(today) || card.getStatus() == false) {
+        if (!card.getDate().after(today) || !card.getStatus()) {
             // Card is not valid or status is inactive
             return false;
         }
