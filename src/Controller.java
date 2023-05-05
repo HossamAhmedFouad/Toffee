@@ -10,6 +10,7 @@ import UserData.User;
 import UserData.Voucher;
 
 import java.sql.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Scanner;
 
@@ -181,7 +182,7 @@ public class Controller {
         //Payment section
         Payment payment = null;
         Date today = new Date(System.currentTimeMillis());
-        Order order = new Order(activeUser.getUserCart().getTotalPrice(), today,address, activeUser.getUserCart().getProducts());
+        Order order = new Order(activeUser.getUserCart().getTotalPrice(), today,address, new HashMap<>(activeUser.getUserCart().getProducts()));
         System.out.println("PLEASE CHOOSE PAYMENT OPTION");
         System.out.println("1 - Cash On Delivery");
         System.out.println("2 - EWallet");
@@ -229,7 +230,6 @@ public class Controller {
                 }else{
                     if(choice==1){
                         Order order = activeUser.getPrevOrders().getOrders().get(id-1);
-                        for (Product product : order.getProducts().keySet()) System.out.println(product.getName());
                         activeUser.getUserCart().setProducts(order.getProducts());
                         checkOut();
                         return;

@@ -33,6 +33,7 @@ public class PreviousOrders {
         for(int i=1;i<=orders.size();i++){
             System.out.println("==========ORDER ID " + i + " ===============");
             orders.get(i-1).displaySummary();
+            System.out.println(orders.get(i-1).getProducts().size());
             System.out.println("====================================");
         }
     }

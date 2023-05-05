@@ -10,7 +10,7 @@ public class Order {
     private double totalPrice;
     private Date date;
     private String shipAddress;
-    private HashMap<Product,Integer> products = new HashMap<Product, Integer>();
+    private HashMap<Product,Integer> products;
 
     private double discount;
 
