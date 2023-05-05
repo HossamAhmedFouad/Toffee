@@ -1,12 +1,16 @@
 package UserData;
 
+import Products.Product;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class PreviousOrders {
     private List<Order> orders;
 
-    public PreviousOrders(List<Order> orders) {
-        this.orders = orders;
+    public PreviousOrders(){
+        orders = new ArrayList<>();
     }
 
     public List<Order> getOrders() {
@@ -17,16 +21,20 @@ public class PreviousOrders {
         this.orders = orders;
     }
 
-    public void reorder(Order order){
-        //TODO : Reorder
+    public HashMap<Product,Integer> reorder(Order order){
+        return order.getProducts();
     }
 
     public void displayOrder(Order order){
-        //TODO: display order details -- Discount Dilemma
+        order.displaySummary();
     }
 
     public void viewOrders(){
-        // TODO: display all orders
+        for(int i=1;i<=orders.size();i++){
+            System.out.println("==========ORDER ID " + i + " ===============");
+            orders.get(i-1).displaySummary();
+            System.out.println("====================================");
+        }
     }
 
     public void addOrder(Order order){

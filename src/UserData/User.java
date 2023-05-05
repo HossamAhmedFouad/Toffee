@@ -10,13 +10,14 @@ public class User {
     private Card userCard;
     private boolean accountActive = true;
     private ShoppingCart userCart = new ShoppingCart();
-    private PreviousOrders orders = new PreviousOrders(new ArrayList<Order>());
+    private PreviousOrders orders;
     private int loyaltyPoints;
     private List<Voucher>vouchers=new ArrayList<Voucher>();
 
 
     public User(Info info){
         userInfo = info;
+        orders = new PreviousOrders();
     }
 
     public Info getUserInfo() {
@@ -67,7 +68,7 @@ public class User {
         this.vouchers = vouchers;
     }
 
-    public PreviousOrders getOrders() {
+    public PreviousOrders getPrevOrders() {
         return orders;
     }
 

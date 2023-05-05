@@ -17,6 +17,10 @@ public class ShoppingCart {
 
     public void setProducts(HashMap<Product,Integer> products) {
         this.products = products;
+        totalPrice = 0;
+        for(Product product : this.products.keySet()){
+            totalPrice+=product.getPrice();
+        }
     }
 
     public double getTotalPrice() {
@@ -117,22 +121,6 @@ public class ShoppingCart {
             System.out.format(format, cnt++, product.getName(), products.get(product), String.format("%.2f", product.getPrice()*products.get(product)));
         }
         System.out.format("\n%-25s $%-10.2f\n", "Total Price:", totalPrice);
-    }
-    public void displaySummary(){
-        double subTotal = totalPrice;
-        int items=0;
-        double deliveryFee = 20;
-        double orderTotal = subTotal + deliveryFee-discount;
-        for (Product product : products.keySet()) {
-            items+=products.get(product);
-        }
-        System.out.println("Order Summary:");
-        System.out.printf("%-20s%.2f EGP\n", "Sub-total", subTotal);
-        System.out.printf("%-20s%d\n", "Items", items);
-        System.out.printf("%-20s%.2f EGP\n", "Delivery Fee", deliveryFee);
-        if(discount>0){System.out.printf("%-20s%.2f EGP\n", "Discount: ", discount);}
-        System.out.println("Order Total:"); 
-        System.out.printf("%.2f\n", orderTotal);
     }
 
     public boolean empty(){

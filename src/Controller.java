@@ -2,6 +2,7 @@ import PaymentSystem.CashOnDelivery;
 import PaymentSystem.Ewallet;
 import PaymentSystem.Payment;
 import Products.Inventory;
+import Products.Product;
 import UserData.Authenticator;
 import UserData.Info;
 import UserData.Order;
@@ -94,11 +95,18 @@ public class Controller {
     public void displayMenu() {
         System.out.println("WELCOME PLEASE CHOOSE ACTION");
         System.out.println("1 - View Catalog Of Products Available");
+        int cnt = 3;
+        if(loggedUser){
+            System.out.println("2 - View Previous Orders");
+        }
         if (!loggedUser) {
             System.out.println("2 - Register");
             System.out.println("3 - Log In");
+            cnt+=1;
         }
-        System.out.println("4 - Exit");
+        System.out.println(cnt + " - Exit");
+
+
     }
 
     public void redeemVoucher() {
@@ -128,6 +136,7 @@ public class Controller {
                 }
             }else if(activeUser.getUserCart().getTotalPrice()==0){
                 System.out.println("CANT ADD VOUCHER TO YOUR ORDER");
+                break;
             }else {
                 break;
             }
@@ -155,6 +164,86 @@ public class Controller {
         }
     }
 
+    public void checkOut(){
+        //Choosing shipping address
+        scanner.nextLine();
+        String address=null;
+        System.out.println("PLEASE CHOOSE ADDRESS");
+        System.out.println("1 - Same account address");
+        System.out.println("2 - Add new address");
+        choice = scanner.nextInt();
+        if (choice == 1) {
+            address=activeUser.getUserInfo().getAddress();
+        } else if (choice == 2) {
+            System.out.println("Enter a new address");
+            address=scanner.nextLine();
+        }
+        //Payment section
+        Payment payment = null;
+        Date today = new Date(System.currentTimeMillis());
+        Order order = new Order(activeUser.getUserCart().getTotalPrice(), today,address, activeUser.getUserCart().getProducts());
+        System.out.println("PLEASE CHOOSE PAYMENT OPTION");
+        System.out.println("1 - Cash On Delivery");
+        System.out.println("2 - EWallet");
+        System.out.println("3 - Back");
+        choice = scanner.nextInt();
+        if (choice == 1) {
+            payment = new CashOnDelivery(order, activeUser);
+        } else if (choice == 2) {
+            payment = new Ewallet(order, activeUser);
+        }else if (choice == 3) {
+            return;
+        }
+        if (activeUser.getUserCart().checkOut(payment)) {
+            scanner.nextLine();
+            redeemVoucher();
+            order.setDiscount(activeUser.getUserCart().getDiscount());
+            order.displaySummary();
+            System.out.println("DO YOU WANT TO CONFIRM? (YES):(NO)");
+            String cAnswer = scanner.nextLine();
+            if (cAnswer.equals("YES")) {
+                activeUser.getPrevOrders().addOrder(order);
+                activeUser.getUserCart().emptyCart();
+                System.out.println("Checkout successfully");
+            }
+        } else {
+            System.out.println("Error in payment");
+        }
+        //TODO : Start payment mode
+    }
+
+    public void prevOrders(){
+        //TODO: initiate Re-ordering previous orders
+        activeUser.getPrevOrders().viewOrders();
+        while (true){
+            System.out.println("PLEASE CHOOSE ACTION");
+            System.out.println("1 - Re-Order");
+            System.out.println("2 - View Order Details");
+            System.out.println("3 - Back");
+            choice = scanner.nextInt();
+            if(choice==1 || choice==2){
+                System.out.println("PLEASE CHOOSE ORDER ID");
+                int id = scanner.nextInt();
+                if(id < 1 || id > activeUser.getPrevOrders().getOrders().size()){
+                    System.out.println("INVALID ID NUMBER");
+                }else{
+                    if(choice==1){
+                        Order order = activeUser.getPrevOrders().getOrders().get(id-1);
+                        for (Product product : order.getProducts().keySet()) System.out.println(product.getName());
+                        activeUser.getUserCart().setProducts(order.getProducts());
+                        checkOut();
+                        return;
+                    }else{
+                        activeUser.getPrevOrders().displayOrder(activeUser.getPrevOrders().getOrders().get(id-1));
+                    }
+                }
+            }else if(choice==3){
+                break;
+            }
+        }
+
+    }
+
     public void viewCart() {
         activeUser.getUserCart().display();
         if (activeUser.getUserCart().empty()) {
@@ -172,51 +261,7 @@ public class Controller {
             if (choice == 1 || choice == 2 || choice == 3) {
                 changeCartItems(choice);
             } else if (choice == 4) {
-                //Choosing shipping address
-                String address=null;
-                System.out.println("PLEASE CHOOSE ADDRESS");
-                System.out.println("1 - Same account address");
-                System.out.println("2 - Add new address");
-                choice = scanner.nextInt();
-                if (choice == 1) {
-                    address=activeUser.getUserInfo().getAddress();
-                } else if (choice == 2) {
-                    System.out.println("Enter a new address");
-                    address=scanner.nextLine();
-                }
-                //Payment section
-                Payment payment = null;
-                Date today = new Date(System.currentTimeMillis());
-                Order order = new Order(activeUser.getUserCart().getTotalPrice(), today,address, activeUser.getUserCart().getProducts());
-                System.out.println("PLEASE CHOOSE PAYMENT OPTION");
-                System.out.println("1 - Cash On Delivery");
-                System.out.println("2 - EWallet");
-                System.out.println("3 - Back");
-                choice = scanner.nextInt();
-                if (choice == 1) {
-                    payment = new CashOnDelivery(order, activeUser);
-                } else if (choice == 2) {
-                    payment = new Ewallet(order, activeUser);
-                }else if (choice == 3) {
-                    continue;
-                }
-                
-                if (activeUser.getUserCart().checkOut(payment)) {
-                    scanner.nextLine();
-                    redeemVoucher();
-                    activeUser.getUserCart().displaySummary();
-                    System.out.println("DO YOU WANT TO CONFIRM? (YES):(NO)");
-                    String cAnswer = scanner.nextLine();
-                    if (cAnswer.equals("YES")) {
-                        activeUser.getOrders().addOrder(order);
-                        activeUser.getUserCart().emptyCart();
-                        System.out.println("Checkout successfully");
-                    }
-                    break;
-                } else {
-                    System.out.println("Error in payment");
-                }
-                //TODO : Start payment mode
+               checkOut();
             } else if (choice == 5) {
                 return;
             }
@@ -270,12 +315,23 @@ public class Controller {
                     break;
                 }
             }
-            } else if (choice == 2 && !loggedUser) {
-                register();
-            } else if (choice == 3 && !loggedUser) {
-                login();
-            } else if (choice == 4) {
-                break;
+            } else{
+                if(loggedUser){
+                    if(choice==2){
+                        prevOrders();
+                    }else if(choice==3){
+                        break;
+                    }
+                }else{
+                    if(choice==2){
+                        register();
+                    }else if(choice==3){
+                        login();
+                    }else if(choice==4){
+                        scanner.close();
+                        break;
+                    }
+                }
             }
         }
     }
