@@ -16,15 +16,14 @@ public class Ewallet extends Payment {
     @Override
     public boolean payOrder() {
         if (authenticator.validateCard(user.getUserCard())) {
-            System.out.println("Card is not valid.");
+            System.out.println("Card Is Not Valid.");
             return false;
         }
+        System.out.println("Please Enter Card CVV: ");
         Scanner scanner = new Scanner(System.in);
-        System.out.println("Please enter pin: "); 
         int input = scanner.nextInt();
-        scanner.close();
         if (input != user.getUserCard().getPin()) {
-            System.out.println("Pin is incorrect."); 
+            System.out.println("Pin Is Incorrect.");
             return false;
         }
         return true;

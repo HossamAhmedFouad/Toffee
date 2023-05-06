@@ -1,11 +1,11 @@
 package UserData;
 
-import java.sql.Date;
+import java.util.Date;
 import java.util.ArrayList;
 import java.util.List;
 
 
-public class User {
+public class User{
     private Info userInfo;
     private Card userCard;
     private boolean accountActive = true;
@@ -78,4 +78,5 @@ public class User {
     public void addVouchers(Voucher voucher) {
         this.vouchers.add(voucher);
     }
+
 }

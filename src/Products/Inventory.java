@@ -3,83 +3,52 @@ package Products;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+import UserData.DataManager;
 import UserData.Voucher;
 
-public class Inventory {
-    /**
-     * Attributes
-     */
-    Scanner scanner;
-    private List<Product> products = new ArrayList<Product>();
-    private List<Voucher> vouchers = new ArrayList<Voucher>();
-    /**
-     * Operations
-     */
-    public Inventory() {
-        loadProducts();
-        loadVoucher();
-        scanner.close();
-    }
+public class Inventory extends DataManager{
 
-    public void loadVoucher() {
-        try {
-            scanner = new Scanner(new File(System.getProperty("user.dir") + "/src/Products/vouchers.csv"));
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-        while (scanner.hasNext()) {
-            String line = scanner.nextLine();
-            String[] data = line.split(",", 3);
-            vouchers.add(new Voucher(data[0], Double.parseDouble(data[1])));
-            //System.out.println(data[0]+" "+Double.parseDouble(data[1]));
-        }
-    }
-    public void loadProducts() {
-        try {
-            scanner = new Scanner(new File(System.getProperty("user.dir") + "/src/Products/stock.csv"));
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-        while (scanner.hasNext()) {
-            String line = scanner.nextLine();
-            String[] data = line.split(",", 7);
-            products.add(new Product(data[0], Double.parseDouble(data[1]), data[2], data[3], data[4],
-                    Integer.parseInt(data[5])));
-        }
-    }
     public void addProduct(Product product){
         products.add(product);
+        uploadData();
     }
 
     public void removeProduct(Product product){
         if(products.isEmpty()) return;
         products.removeIf(x -> x.getName().equals(product.getName()));
+        uploadData();
     }
 
     public void editProduct(Product old, Product edit){
         if(products.isEmpty()) return;
         products.removeIf(x -> x.getName().equals(old.getName()));
         products.add(edit);
+        uploadData();
     }
 
-    public void setAvailability(Product product, Availability status){
+    public void setAvailability(Product product, Availability status) {
         for (Product value : products) {
             if (value.getName().equals(product.getName())) {
                 value.setStatus(status);
                 break;
             }
         }
+        uploadData();
     }
-    public List<Product> getProducts(){
+    
+    public List<Product> getProducts() {
         return products;
     }
+    
     public void display(){
         if(products.isEmpty()){
-            System.out.println("There are no products");
+            System.out.println("There Are No Products");
             return;
         }
         int cnt = 1;
@@ -97,15 +66,89 @@ public class Inventory {
         }
     }
 
-    public List<Product> search(String name){
-        List<Product>found = new ArrayList<>();
-        for(Product product : products){
-            if(product.getName().equals(name)) found.add(product);
+    public List<Product> search(String name) {
+        List<Product> found = new ArrayList<>();
+        for (Product product : products) {
+            if (product.getName().equals(name))
+                found.add(product);
         }
         return found;
     }
-    public List<Voucher> getVoucher(){
+    
+    public List<Voucher> getVoucher() {
         return vouchers;
+    }
+
+    public void update() {
+        uploadData();
+    }
+    
+    @Override
+    protected void uploadData() {
+        try {
+            myWriter = new FileWriter(System.getProperty("user.dir") + "/src/Products/stock.csv");
+            for (Product product : products) {
+                String name = product.getName();
+                Double price = product.getPrice();
+                String category = product.getCategory();
+                String brand = product.getBrand();
+                String unitType = product.getUnitType(); 
+                int quantity = product.getQuantity();
+                String line = String.format("%s,%s,%s,%s,%s,%s\n", name, price, category, brand, unitType, quantity);
+                myWriter.write(line);
+            }
+            myWriter.close();
+        } catch (IOException e) {
+            System.err.println("Caught IOException: " + e.getMessage());
+            e.printStackTrace();
+        }
+        try {
+            myWriter = new FileWriter(System.getProperty("user.dir") + "/src/Products/vouchers.csv");
+            for (Voucher voucher : vouchers) {
+                String code = voucher.getCode();
+                Double amount = voucher.getAmount();
+                String line = String.format("%s,%s\n", code, amount);
+                myWriter.write(line);
+            }
+            myWriter.close();
+        } catch (IOException e) {
+            System.err.println("Caught IOException: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    protected void loadData() {
+        //Loading vouchers data
+        try {
+            scanner = new Scanner(new File(System.getProperty("user.dir") + "/src/Products/vouchers.csv"));
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+        while (scanner.hasNext()) {
+            String line = scanner.nextLine();
+            String[] data = line.split(",", 3);
+            String code = data[0];
+            Double amount = Double.parseDouble(data[1]);
+            vouchers.add(new Voucher(code,amount));
+        }
+        //Loading products data
+        try {
+            scanner = new Scanner(new File(System.getProperty("user.dir") + "/src/Products/stock.csv"));
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+        while (scanner.hasNext()) {
+            String line = scanner.nextLine();
+            String[] data = line.split(",", 7);
+            String name = data[0];
+            Double price = Double.parseDouble(data[1]);
+            String category = data[2];
+            String brand = data[3];
+            String unitType = data[4]; 
+            int quantity = Integer.parseInt(data[5]);
+            products.add(new Product(name, price, category, brand, unitType, quantity));
+        }
     }
 
 }

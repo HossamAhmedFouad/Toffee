@@ -13,6 +13,7 @@ public class Card {
         this.date = date;
         this.pin = pin;
     }
+    
     public void terminate(){
         //TODO: terminate card and make status not active
         status = false;
@@ -22,13 +23,15 @@ public class Card {
         return date;
     }
 
-    public void update() {
-        // TODO: update card details, may need to take parameters and update uml diagram
-    }
     public boolean getStatus() {
         return status;
     }
-    public int getPin(){
+
+    public int getPin() {
         return pin;
+    }
+
+    public String getCardNumber() {
+        return cardNumber;
     }
 }

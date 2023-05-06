@@ -2,7 +2,6 @@ import PaymentSystem.CashOnDelivery;
 import PaymentSystem.Ewallet;
 import PaymentSystem.Payment;
 import Products.Inventory;
-import Products.Product;
 import UserData.Authenticator;
 import UserData.Info;
 import UserData.Order;
@@ -42,8 +41,6 @@ public class Controller {
 
         Info info = new Info(name,email,password,shippingAddress);
 
-        //TODO: validate data + generate OTP from Authenticator
-        //Done
         if (authenticator.validateInfo(info)) {
             System.out.println("Error, Email already used");
             return;
@@ -96,20 +93,39 @@ public class Controller {
     public void displayMenu() {
         System.out.println("WELCOME PLEASE CHOOSE ACTION");
         System.out.println("1 - View Catalog Of Products Available");
-        int cnt = 3;
-        if(loggedUser){
+        if (loggedUser) {
             System.out.println("2 - View Previous Orders");
+            System.out.println("3 - Update Credit Card Details");
         }
         if (!loggedUser) {
             System.out.println("2 - Register");
             System.out.println("3 - Log In");
-            cnt+=1;
         }
-        System.out.println(cnt + " - Exit");
-
-
+        System.out.println("4 - Exit");
     }
-
+    
+    public void updateCard() {
+        if (activeUser.getUserCard() == null) {
+            System.out.println("There Is No Credit Card In Your Account.");
+            System.out.println("Do You Want To Add One? (YES):(NO)");
+        } else {
+            System.out.println("There Is Credit Card In Your Account.");
+            System.out.println("Do You Want To Update It? (YES):(NO)");
+        }
+        scanner.nextLine();
+        String Answer = scanner.nextLine();
+        if (Answer.equals("NO"))
+            return;
+        System.out.print("Please Enter Card Number:");
+        String cardNum = scanner.nextLine();
+        System.out.print("Please Enter Expiry Date:");
+        String expDate = scanner.nextLine();
+        System.out.print("Please Enter CVV:");
+        int pin = scanner.nextInt();
+        authenticator.addCard(activeUser, cardNum, expDate, pin);
+        System.out.println("Credit Card Was Updated");
+    }
+    
     public void redeemVoucher() {
         while (true) {
             System.out.println("DO YOU WANT TO REDEEM A VOUCHER? (YES):(NO)");
@@ -117,7 +133,7 @@ public class Controller {
             if (vAnswer.equals("YES") && activeUser.getUserCart().getTotalPrice() > 0) {
                 
                 if (!activeUser.getVouchers().isEmpty()) {
-                    System.out.println("Available vouchers:");
+                    System.out.println("Available Vouchers:");
                     displayVouchers(activeUser.getVouchers());
                     System.out.println(activeUser.getVouchers().get(choice-1).getAmount());
                     System.out.println(activeUser.getUserCart().getTotalPrice());
@@ -132,7 +148,7 @@ public class Controller {
                     }
                     
                 } else {
-                    System.out.println("No vouchers available.");
+                    System.out.println("No Vouchers Available.");
                     break;
                 }
             }else if(activeUser.getUserCart().getTotalPrice()==0){
@@ -156,12 +172,12 @@ public class Controller {
         Info info = new Info();
         info.setEmail(email);
         info.setPassword(password);
-        if (authenticator.validateInfo(info)) {
+        if (authenticator.validateInfo(info) && authenticator.validatePass(info)) {
             loggedUser = true;
             activeUser = authenticator.getUser(info);
             System.out.println("Login Has Been Successful, Welcome " + activeUser.getUserInfo().getName());
         } else {
-            System.out.println("Invalid, Credentials");
+            System.out.println("Invalid Credentials");
         }
     }
 
@@ -170,13 +186,13 @@ public class Controller {
         scanner.nextLine();
         String address=null;
         System.out.println("PLEASE CHOOSE ADDRESS");
-        System.out.println("1 - Same account address");
-        System.out.println("2 - Add new address");
+        System.out.println("1 - Same Account Address");
+        System.out.println("2 - Add New Address");
         choice = scanner.nextInt();
         if (choice == 1) {
             address=activeUser.getUserInfo().getAddress();
         } else if (choice == 2) {
-            System.out.println("Enter a new address");
+            System.out.println("Enter A New Address");
             address=scanner.nextLine();
         }
         //Payment section
@@ -205,16 +221,20 @@ public class Controller {
             if (cAnswer.equals("YES")) {
                 activeUser.getPrevOrders().addOrder(order);
                 activeUser.getUserCart().emptyCart();
-                System.out.println("Checkout successfully");
+                inventory.update();
+                System.out.println("Checkout Successfully");
             }
         } else {
-            System.out.println("Error in payment");
+            System.out.println("Error In Payment");
         }
-        //TODO : Start payment mode
     }
 
     public void prevOrders(){
-        //TODO: initiate Re-ordering previous orders
+        //TODO: initiate Re-ordering previous order
+        if (activeUser.getPrevOrders().getOrders().size() == 0) {
+            System.out.println("There Are No Previous Orders");
+            return;
+        }
         activeUser.getPrevOrders().viewOrders();
         while (true){
             System.out.println("PLEASE CHOOSE ACTION");
@@ -246,10 +266,8 @@ public class Controller {
 
     public void viewCart() {
         activeUser.getUserCart().display();
-        if (activeUser.getUserCart().empty()) {
-            System.out.println("Cart is empty!");
+        if (activeUser.getUserCart().empty()) 
             return;
-        }
         while (true) {
             System.out.println("PLEASE CHOOSE ACTION");
             System.out.println("1 - Increase amount");
@@ -261,7 +279,7 @@ public class Controller {
             if (choice == 1 || choice == 2 || choice == 3) {
                 changeCartItems(choice);
             } else if (choice == 4) {
-               checkOut();
+                checkOut();
             } else if (choice == 5) {
                 return;
             }
@@ -289,65 +307,67 @@ public class Controller {
             choice = scanner.nextInt();
             if (choice == 1) {
                 inventory.display();
-                while(true){
-                System.out.println("PLEASE CHOOSE ACTION");
-                System.out.println("1 - Add an item to cart");
-                System.out.println("2 - Go to cart");
-                System.out.println("3 - Buy a voucher");
-                System.out.println("4 - Go Back");
-                choice = scanner.nextInt();
-                if (choice == 1) {
+                while (true) {
+                    System.out.println("PLEASE CHOOSE ACTION");
+                    System.out.println("1 - Add an item to cart");
+                    System.out.println("2 - Go to cart");
+                    System.out.println("3 - Buy a voucher");
+                    System.out.println("4 - Go Back");
+                    choice = scanner.nextInt();
                     if (loggedUser) {
-                        addItem();
+                        if (choice == 1) {
+                            addItem();
+                        } else if (choice == 2) {
+                            viewCart();
+                        } else if (choice == 3) {
+                            buyVoucher();
+                            displayVouchers(activeUser.getVouchers());
+                        }else if (choice == 4) {
+                            break;
+                        }
+                    } else if (choice == 4) {
+                        break;
                     } else {
-                        System.out.println("YOU MUST BE A USER TO ADD AN ITEM TO CART");
+                        System.out.println("You Must Be A User To Do This Action");
                     }
-                } else if (choice == 2) {
-                    if (loggedUser) {
-                        viewCart();
-                    } else {
-                        System.out.println("YOU MUST BE A USER TO ADD AN ITEM TO CART");
-                    }
-                }else if(choice == 3){
-                    buyVoucher();
-                    displayVouchers(activeUser.getVouchers());
-                }else if (choice == 4) {
-                    break;
+                    
                 }
+            } else if (choice == 4) {
+                scanner.close();
+                break;
             }
-            } else{
+            else{
                 if(loggedUser){
                     if(choice==2){
                         prevOrders();
                     }else if(choice==3){
-                        break;
+                        updateCard();
                     }
                 }else{
                     if(choice==2){
                         register();
                     }else if(choice==3){
                         login();
-                    }else if(choice==4){
-                        scanner.close();
-                        break;
                     }
                 }
             }
         }
     }
+
     public void displayVouchers(List<Voucher> vouchers) {
 
-            if (vouchers.isEmpty()) {
-                System.out.println("No vouchers available.");
-                return;
-            }
-            int cnt = 1;
-            String format = "%-5s %-20s $%-10s\n";
-            System.out.format(format, "No.", "Voucher Code", "Amount");
-            for (Voucher voucher : vouchers) {
-                System.out.format(format, cnt++, voucher.getCode(), String.format("%.2f", voucher.getAmount()));
-            }
+        if (vouchers.isEmpty()) {
+            System.out.println("No vouchers available.");
+            return;
+        }
+        int cnt = 1;
+        String format = "%-5s %-20s $%-10s\n";
+        System.out.format(format, "No.", "Voucher Code", "Amount");
+        for (Voucher voucher : vouchers) {
+            System.out.format(format, cnt++, voucher.getCode(), String.format("%.2f", voucher.getAmount()));
+        }
     }
+    
     public void buyVoucher(){
         while(true){
             displayVouchers(inventory.getVoucher());

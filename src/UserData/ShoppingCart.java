@@ -26,9 +26,11 @@ public class ShoppingCart {
     public double getTotalPrice() {
         return totalPrice;
     }
+    
     public double getDiscount() {
         return discount;
     }
+    
     public void setDiscount(double discount) {
         this.discount=discount;
     }
@@ -37,23 +39,23 @@ public class ShoppingCart {
         this.totalPrice = totalPrice;
     }
 
-    public void increaseAmount(int idx){
-        if(idx<1 || idx>products.size()){
-            System.out.println("ERR INVALID ID");
+    public void increaseAmount(int idx) {
+        if (idx < 1 || idx > products.size()) {
+            System.out.println("INVALID ID");
             return;
         }
-        for(Product product : products.keySet()){
+        for (Product product : products.keySet()) {
             if (idx - 1 == 0) {
                 addProduct(product);
                 break;
             }
             idx--;
         }
-
     }
+    
     public void decreaseAmount(int idx){
         if(idx<1 || idx>products.size()){
-            System.out.println("ERR INVALID ID");
+            System.out.println("INVALID ID");
             return;
         }
         for (Product product : products.keySet()) {
@@ -70,13 +72,13 @@ public class ShoppingCart {
 
     public void removeProduct(int idx){
         if(idx<1 || idx>products.size()){
-            System.out.println("ERR INVALID ID");
+            System.out.println("INVALID ID");
             return;
         }
         for(Product product : products.keySet()){
             if (idx - 1 == 0) {
                 product.setQuantity(product.getQuantity() + products.get(product));
-                totalPrice-= product.getPrice() * products.get(product);
+                totalPrice -= product.getPrice() * products.get(product);
                 products.remove(product);
                 break;
             }
@@ -102,7 +104,7 @@ public class ShoppingCart {
         if (product.getStatus() != Availability.outOfStock) {
             product.setQuantity(product.getQuantity() - 1);
         } else {
-            System.out.println("Product is out of stock");
+            System.out.println("Product Is Out Of Stock");
             return;
         }
         products.put(product, products.getOrDefault(product, 0) + 1);
