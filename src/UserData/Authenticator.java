@@ -3,12 +3,15 @@ package UserData;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Random;
+import java.util.Scanner;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 
 public class Authenticator extends DataManager {
     private String otp;
@@ -44,6 +47,17 @@ public class Authenticator extends DataManager {
         users.put(info.getEmail(), user);
         uploadData();
     }
+    
+    private String validateInput(String userInput, String regexPattern, String errorMessage, Scanner scanner) {
+        Pattern regex = Pattern.compile(regexPattern);
+        Matcher matcher = regex.matcher(userInput);
+        while (!matcher.matches()){
+            System.out.print(errorMessage);
+            userInput = scanner.nextLine();
+            matcher = regex.matcher(userInput);
+        }
+        return userInput;
+    }
 
     private Date parseDate(String target) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("MM/yy");
@@ -73,6 +87,23 @@ public class Authenticator extends DataManager {
     }
     
     public boolean validateInfo(Info info) {
+        Scanner scanner = new Scanner(System.in);
+        // Validate name
+        String name = validateInput(info.getName(), "^[A-Za-z- ']+$", "Please enter a valid name: ",scanner);
+        info.setName(name);
+    
+        // Validate email
+        String email = validateInput(info.getEmail(), "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$", "Please enter a valid email address: ",scanner);
+        info.setEmail(email);
+    
+        // Validate password
+        String password = validateInput(info.getPassword(), "^[A-Za-z0-9]{6,}$", "Please enter a valid password (at least 6 characters): ", scanner);
+        info.setPassword(password);
+    
+        // Validate shipping address
+        String address = validateInput(info.getAddress(), "^[A-Za-z0-9- ',]+$", "Please enter a valid shipping address: ",scanner);
+        info.setAddress(address);
+
         return users.containsKey(info.getEmail());
     }
 
