@@ -15,7 +15,7 @@ public class Ewallet extends Payment {
 
     @Override
     public boolean payOrder() {
-        if (authenticator.validateCard(user.getUserCard())) {
+        if (!authenticator.validateCard(user.getUserCard())) {
             System.out.println("Card Is Not Valid.");
             return false;
         }
