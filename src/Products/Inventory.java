@@ -1,19 +1,16 @@
 package Products;
 
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 
+import UserData.CartObserver;
 import UserData.DataManager;
 import UserData.Voucher;
 
-public class Inventory extends DataManager{
-
+public class Inventory extends DataManager implements CartObserver{
+    private List<Product> products;
+    private List<Voucher> vouchers;
+    
     public void addProduct(Product product){
         products.add(product);
         uploadData();
@@ -78,77 +75,63 @@ public class Inventory extends DataManager{
     public List<Voucher> getVoucher() {
         return vouchers;
     }
-
-    public void update() {
-        uploadData();
-    }
     
     @Override
     protected void uploadData() {
-        try {
-            myWriter = new FileWriter(System.getProperty("user.dir") + "/src/Products/stock.csv");
-            for (Product product : products) {
-                String name = product.getName();
-                Double price = product.getPrice();
-                String category = product.getCategory();
-                String brand = product.getBrand();
-                String unitType = product.getUnitType(); 
-                int quantity = product.getQuantity();
-                String line = String.format("%s,%s,%s,%s,%s,%s\n", name, price, category, brand, unitType, quantity);
-                myWriter.write(line);
-            }
-            myWriter.close();
-        } catch (IOException e) {
-            System.err.println("Caught IOException: " + e.getMessage());
-            e.printStackTrace();
+        List<String> productLines = new ArrayList<>();
+        List<String> voucherLines = new ArrayList<>();
+        productLines.add("Name,Price,Category,Brand,Unit Type,Quantity\n");
+        voucherLines.add("Code,Amount\n");
+        for (Product product : products) {
+            String name = product.getName();
+            Double price = product.getPrice();
+            String category = product.getCategory();
+            String brand = product.getBrand();
+            String unitType = product.getUnitType();
+            int quantity = product.getQuantity();
+            String line = String.format("%s,%s,%s,%s,%s,%s\n", name, price, category, brand, unitType, quantity);
+            productLines.add(line);
         }
-        try {
-            myWriter = new FileWriter(System.getProperty("user.dir") + "/src/Products/vouchers.csv");
-            for (Voucher voucher : vouchers) {
-                String code = voucher.getCode();
-                Double amount = voucher.getAmount();
-                String line = String.format("%s,%s\n", code, amount);
-                myWriter.write(line);
-            }
-            myWriter.close();
-        } catch (IOException e) {
-            System.err.println("Caught IOException: " + e.getMessage());
-            e.printStackTrace();
+        for (Voucher voucher : vouchers) {
+            String code = voucher.getCode();
+            Double amount = voucher.getAmount();
+            String line = String.format("%s,%s\n", code, amount);
+            voucherLines.add(line);
         }
+    
+        saveToFile(System.getProperty("user.dir") + "/src/Products/stock.csv", productLines);
+        saveToFile(System.getProperty("user.dir") + "/src/Products/vouchers.csv", voucherLines);
     }
 
     @Override
     protected void loadData() {
-        //Loading vouchers data
-        try {
-            scanner = new Scanner(new File(System.getProperty("user.dir") + "/src/Products/vouchers.csv"));
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-        while (scanner.hasNext()) {
-            String line = scanner.nextLine();
-            String[] data = line.split(",", 3);
-            String code = data[0];
-            Double amount = Double.parseDouble(data[1]);
-            vouchers.add(new Voucher(code,amount));
-        }
-        //Loading products data
-        try {
-            scanner = new Scanner(new File(System.getProperty("user.dir") + "/src/Products/stock.csv"));
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-        while (scanner.hasNext()) {
-            String line = scanner.nextLine();
+        List<String> productLines = readFromFile(System.getProperty("user.dir") + "/src/Products/stock.csv");
+        List<String> voucherLines = readFromFile(System.getProperty("user.dir") + "/src/Products/vouchers.csv");
+        products = new ArrayList<Product>();
+        vouchers = new ArrayList<Voucher>();
+        for (String line : productLines) {
             String[] data = line.split(",", 7);
             String name = data[0];
             Double price = Double.parseDouble(data[1]);
             String category = data[2];
             String brand = data[3];
-            String unitType = data[4]; 
+            String unitType = data[4];
             int quantity = Integer.parseInt(data[5]);
-            products.add(new Product(name, price, category, brand, unitType, quantity));
+            Product product = new Product(name, price, category, brand, unitType, quantity);
+            products.add(product);
         }
+    
+        for (String line : voucherLines) {
+            String[] data = line.split(",", 2);
+            String code = data[0];
+            Double amount = Double.parseDouble(data[1]);
+            vouchers.add(new Voucher(code, amount));
+        }
+    }
+
+    @Override
+    public void onCheckout() {
+        uploadData();
     }
 
 }

@@ -1,4 +1,5 @@
-Molten Cake,150.0,Cakes,Baskin-Robins,unit,15
+Name,Price,Category,Brand,Unit Type,Quantity
+Molten Cake,150.0,Cakes,Baskin-Robins,unit,0
 Orange Cake,110.0,Cakes,Baskin-Robins,unit,20
 Brownies,90.0,Cakes,Froster,unit,10
 Cookies,20.0,Pastries,Monginis,unit,10
@@ -7,4 +8,4 @@ Apple Pie,113.0,Pastries,Nestle,unit,20
 Biscuits,20.0,Pastries,Baskin-Robins,unit,20
 Ice Cream,37.0,Frozen,Baskin-Robins,unit,44
 Cheese Cake,140.0,Cake,EL ABD, unit,20
-Muhallabia,10.0,Frozen,Gelaty Aza,unit,40
+Muhallabia,10.0,Frozen,Gelaty Aza,unit,19

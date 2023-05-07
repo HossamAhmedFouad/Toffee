@@ -9,20 +9,25 @@ import java.util.HashMap;
 public class ShoppingCart {
     private HashMap<Product,Integer> products = new HashMap<Product, Integer>();
     private double totalPrice=0;
-    private double discount=0;
+    private double discount = 0;
+    private CartObserver observer;
 
     public HashMap<Product, Integer> getProducts() {
         return products;
     }
 
-    public void setProducts(HashMap<Product,Integer> products) {
+    public void setProducts(HashMap<Product, Integer> products) {
         this.products = products;
         totalPrice = 0;
-        for(Product product : this.products.keySet()){
-            totalPrice+=product.getPrice();
+        for (Product product : this.products.keySet()) {
+            totalPrice += product.getPrice();
         }
     }
-
+    
+    public void setObserver(CartObserver observer) {
+        this.observer = observer;
+    }
+    
     public double getTotalPrice() {
         return totalPrice;
     }
@@ -89,6 +94,9 @@ public class ShoppingCart {
     public void emptyCart(){
         products.clear();
         totalPrice = 0;
+        if (observer != null) {
+            observer.onCheckout();
+        }
     }
 
     public boolean checkOut(Payment payment){

@@ -27,14 +27,14 @@ public class Controller {
         loggedUser = false;
     }
 
-    public void register() {
+    private void register() {
         scanner.nextLine();
         String name, email, password, shippingAddress;
-        System.out.print("Enter name: ");
+        System.out.print("Enter Name: ");
         name = scanner.nextLine();
-        System.out.print("Enter email: ");
+        System.out.print("Enter Email: ");
         email = scanner.nextLine();
-        System.out.print("Enter password: ");
+        System.out.print("Enter Password: ");
         password = scanner.nextLine();
         System.out.print("Enter Shipping Address: ");
         shippingAddress = scanner.nextLine();
@@ -42,11 +42,11 @@ public class Controller {
         Info info = new Info(name,email,password,shippingAddress);
 
         if (authenticator.validateInfo(info)) {
-            System.out.println("Error, Email already used");
+            System.out.println("Error: Email Already Used");
             return;
         }
         info.setOTP(authenticator.generateOTP());
-        System.out.println("Please enter OTP sent to your email address: " + info.getEmail());
+        System.out.println("Please Enter OTP Sent To Your Email Address: " + info.getEmail());
         String input = scanner.nextLine();
         System.out.println(info.getOTP());
         while(!input.equals(info.getOTP())) {
@@ -59,12 +59,12 @@ public class Controller {
             scanner.nextLine();
             if (choice == 1 || choice == 3) {
                 if (choice == 3) {
-                    System.out.print("Enter email: ");
+                    System.out.print("Enter Email: ");
                     email = scanner.nextLine();
                     info.setEmail(email);
                 }
                 info.setOTP(authenticator.generateOTP());
-                System.out.println("Please enter OTP sent to your email address: " + info.getEmail());
+                System.out.println("Please Enter OTP Sent To Your Email Address: " + info.getEmail());
                 input = scanner.nextLine();
             } else if (choice == 2) {
                 input = scanner.nextLine();
@@ -73,12 +73,11 @@ public class Controller {
             }
         }
         authenticator.addUser(info);
-        activeUser = authenticator.getUser(info);
-        System.out.println("Register Has Been Successful, you can login now");
-        System.out.println("Returning back to main menu");
+        System.out.println("Register Has Been Successful, You Can Login Now");
+        System.out.println("Returning Back To Main Menu...");
     }
 
-    public void changeCartItems(int choice) {
+    private void changeCartItems(int choice) {
         System.out.println("PLEASE ENTER PRODUCT NUMBER");
         int id = scanner.nextInt();
         if (choice == 1) {
@@ -90,8 +89,8 @@ public class Controller {
         }
     }
 
-    public void displayMenu() {
-        System.out.println("WELCOME PLEASE CHOOSE ACTION");
+    private void displayMenu() {
+        System.out.println("========== Welcome To Toffee Shop ==========");
         System.out.println("1 - View Catalog Of Products Available");
         if (loggedUser) {
             System.out.println("2 - View Previous Orders");
@@ -104,7 +103,7 @@ public class Controller {
         System.out.println("4 - Exit");
     }
     
-    public void updateCard() {
+    private void updateCard() {
         if (activeUser.getUserCard() == null) {
             System.out.println("There Is No Credit Card In Your Account.");
             System.out.println("Do You Want To Add One? (YES):(NO)");
@@ -126,7 +125,7 @@ public class Controller {
         System.out.println("Credit Card Was Updated");
     }
     
-    public void redeemVoucher() {
+    private void redeemVoucher() {
         while (true) {
             System.out.println("DO YOU WANT TO REDEEM A VOUCHER? (YES):(NO)");
             String vAnswer = scanner.nextLine();
@@ -160,7 +159,7 @@ public class Controller {
         }
     }
 
-    public void login() {
+    private void login() {
         String email, password, input;
         scanner.nextLine();
         System.out.print("Enter email: ");
@@ -175,13 +174,14 @@ public class Controller {
         if (authenticator.validateInfo(info) && authenticator.validatePass(info)) {
             loggedUser = true;
             activeUser = authenticator.getUser(info);
+            activeUser.getUserCart().setObserver(inventory);
             System.out.println("Login Has Been Successful, Welcome " + activeUser.getUserInfo().getName());
         } else {
             System.out.println("Invalid Credentials");
         }
     }
 
-    public void checkOut(){
+    private void checkOut(){
         //Choosing shipping address
         scanner.nextLine();
         String address=null;
@@ -221,7 +221,6 @@ public class Controller {
             if (cAnswer.equals("YES")) {
                 activeUser.getPrevOrders().addOrder(order);
                 activeUser.getUserCart().emptyCart();
-                inventory.update();
                 System.out.println("Checkout Successfully");
             }
         } else {
@@ -229,7 +228,7 @@ public class Controller {
         }
     }
 
-    public void prevOrders(){
+    private void prevOrders(){
         //TODO: initiate Re-ordering previous order
         if (activeUser.getPrevOrders().getOrders().size() == 0) {
             System.out.println("There Are No Previous Orders");
@@ -264,7 +263,7 @@ public class Controller {
 
     }
 
-    public void viewCart() {
+    private void viewCart() {
         activeUser.getUserCart().display();
         if (activeUser.getUserCart().empty()) 
             return;
@@ -280,24 +279,23 @@ public class Controller {
                 changeCartItems(choice);
             } else if (choice == 4) {
                 checkOut();
+                return;
             } else if (choice == 5) {
                 return;
             }
         }
     }
 
-    public void addItem() {
+    private void addItem() {
         scanner.nextLine();
         System.out.println("PLEASE ENTER ITEM NUMBER: ");
         choice = scanner.nextInt();
-        if (choice <= 0 || choice > inventory.getProducts().size()) {
-            System.out.println("INVALID NUMBER");
+        if (choice <= 0 || choice > inventory.getProducts().size() || inventory.getProducts().get(choice - 1).getQuantity() == 0) {
+            System.out.println("Error: Can't Add Item To The Cart");
             return;
         } 
         System.out.println(inventory.getProducts().get(choice - 1));
         activeUser.getUserCart().addProduct(inventory.getProducts().get(choice - 1));
-        //TODO: CHECK QUANTITY AND AVAILABILITY
-        //Done
     }
 
     public void start() {
@@ -354,7 +352,7 @@ public class Controller {
         }
     }
 
-    public void displayVouchers(List<Voucher> vouchers) {
+    private void displayVouchers(List<Voucher> vouchers) {
 
         if (vouchers.isEmpty()) {
             System.out.println("No vouchers available.");
@@ -368,7 +366,7 @@ public class Controller {
         }
     }
     
-    public void buyVoucher(){
+    private void buyVoucher(){
         while(true){
             displayVouchers(inventory.getVoucher());
             choice=scanner.nextInt();
@@ -379,5 +377,4 @@ public class Controller {
             }
         }
     }
-
 }

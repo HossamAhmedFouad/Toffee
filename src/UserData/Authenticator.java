@@ -1,20 +1,19 @@
 package UserData;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Random;
-import java.util.Scanner;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
 public class Authenticator extends DataManager {
     private String otp;
-
+    private HashMap<String, User> users;
+    
     public boolean validateCard(Card card) {
         Date today = new Date(System.currentTimeMillis());
         if (card == null || card.getDate().after(today) || !card.getStatus()) {
@@ -74,59 +73,42 @@ public class Authenticator extends DataManager {
     }
     
     public boolean validateInfo(Info info) {
-        System.out.println(users.containsKey(info.getEmail()));
         return users.containsKey(info.getEmail());
     }
 
     @Override
     protected void uploadData() {
-        try {
-            myWriter = new FileWriter(System.getProperty("user.dir") + "/src/UserData/users.csv");
-            for (Map.Entry<String, User> entry : users.entrySet()) {
-                User user = entry.getValue();
-                String name = user.getUserInfo().getName();
-                String email = user.getUserInfo().getEmail();
-                String password = user.getUserInfo().getPassword();
-                String address = user.getUserInfo().getAddress();
-                String line = String.format("%s,%s,%s,%s\n", name, email, password, address);
-                myWriter.write(line);
-            }
-            myWriter.close();
-        } catch (IOException e) {
-            System.err.println("Caught IOException: " + e.getMessage());
-            e.printStackTrace();
-        }
+        List<String> userLines = new ArrayList<>();
+        List<String> cardLines = new ArrayList<>();
+        userLines.add("Name,Email,Password,Address\n");
+        cardLines.add("Email,Card Number,Expiry Date,CVV\n");
+        for (Map.Entry<String, User> entry : users.entrySet()) {
+            User user = entry.getValue();
+            String name = user.getUserInfo().getName();
+            String email = user.getUserInfo().getEmail();
+            String password = user.getUserInfo().getPassword();
+            String address = user.getUserInfo().getAddress();
+            String line = String.format("%s,%s,%s,%s\n", name, email, password, address);
+            userLines.add(line);
 
-        try {
-            myWriter = new FileWriter(System.getProperty("user.dir") + "/src/UserData/cards.csv");
-            for (Map.Entry<String, User> entry : users.entrySet()) {
-                User user = entry.getValue();
-                if (user.getUserCard() == null)
-                    continue;
-                String email = user.getUserInfo().getEmail();
+            if (user.getUserCard() != null) {
                 String cardNumber = user.getUserCard().getCardNumber();
-                String expDate = (user.getUserCard().getDate().getMonth()+1) + "/" + (user.getUserCard().getDate().getYear()-100);
+                String expDate = (user.getUserCard().getDate().getMonth() + 1) + "/" + (user.getUserCard().getDate().getYear() - 100);
                 int pin = user.getUserCard().getPin();
-                String line = String.format("%s,%s,%s,%s\n", email, cardNumber, expDate, pin);
-                myWriter.write(line);
+                String cardLine = String.format("%s,%s,%s,%s\n", email, cardNumber, expDate, pin);
+                cardLines.add(cardLine);
             }
-            myWriter.close();
-        } catch (IOException e) {
-            System.err.println("Caught IOException: " + e.getMessage());
-            e.printStackTrace();
         }
+        saveToFile(System.getProperty("user.dir") + "/src/UserData/users.csv", userLines);
+        saveToFile(System.getProperty("user.dir") + "/src/UserData/cards.csv", cardLines);
     }
 
     @Override
     protected void loadData() {
-        try {
-            File myFile = new File(System.getProperty("user.dir") + "/src/UserData/users.csv");
-            scanner = new Scanner(myFile);
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-        while (scanner.hasNext()) {
-            String line = scanner.nextLine();
+        List<String> userLines = readFromFile(System.getProperty("user.dir") + "/src/UserData/users.csv");
+        List<String> cardLines = readFromFile(System.getProperty("user.dir") + "/src/UserData/cards.csv");
+        users = new HashMap<String, User>();
+        for (String line : userLines) {
             String[] data = line.split(",", 4);
             String name = data[0];
             String email = data[1];
@@ -137,13 +119,7 @@ public class Authenticator extends DataManager {
             users.put(info.getEmail(), user);
         }
 
-        try {
-            scanner = new Scanner(new File(System.getProperty("user.dir") + "/src/UserData/cards.csv"));
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-        while (scanner.hasNext()) {
-            String line = scanner.nextLine();
+        for (String line : cardLines) {
             String[] data = line.split(",", 4);
             String email = data[0];
             String cardNumber = data[1];
