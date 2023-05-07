@@ -115,11 +115,11 @@ public class Controller {
         String Answer = scanner.nextLine();
         if (Answer.equals("NO"))
             return;
-        System.out.print("Please Enter Card Number:");
+        System.out.print("Please Enter Card Number: ");
         String cardNum = scanner.nextLine();
-        System.out.print("Please Enter Expiry Date:");
+        System.out.print("Please Enter Expiry Date: ");
         String expDate = scanner.nextLine();
-        System.out.print("Please Enter CVV:");
+        System.out.print("Please Enter CVV: ");
         int pin = scanner.nextInt();
         authenticator.addCard(activeUser, cardNum, expDate, pin);
         System.out.println("Credit Card Was Updated");
@@ -201,7 +201,7 @@ public class Controller {
         Order order = new Order(activeUser.getUserCart().getTotalPrice(), today,address, new HashMap<>(activeUser.getUserCart().getProducts()));
         System.out.println("PLEASE CHOOSE PAYMENT OPTION");
         System.out.println("1 - Cash On Delivery");
-        System.out.println("2 - EWallet");
+        System.out.println("2 - Credit Card");
         System.out.println("3 - Back");
         choice = scanner.nextInt();
         if (choice == 1) {

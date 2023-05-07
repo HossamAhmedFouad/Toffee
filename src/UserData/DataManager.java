@@ -15,7 +15,6 @@ public abstract class DataManager {
     
     public DataManager() {
         loadData();
-        scanner.close();
     }
 
     protected abstract void uploadData();

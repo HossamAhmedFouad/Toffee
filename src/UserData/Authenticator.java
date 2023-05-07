@@ -20,7 +20,7 @@ public class Authenticator extends DataManager {
     public boolean validateCard(Card card) {
         Date today = new Date(System.currentTimeMillis());
         if (card == null || card.getDate().after(today) || !card.getStatus()) {
-            // Card is not valid or status is inactive
+            // Card is not valid or status is inactive or user does not have a card
             return false;
         }
         return true;
@@ -72,7 +72,14 @@ public class Authenticator extends DataManager {
     }
 
     public void addCard(User user, String cardNumber, String date, int pin) {
-        //TODO: check validation of the card  (regex)
+        scanner = new Scanner(System.in);
+        cardNumber = validateInput(cardNumber, "\\b(?:\\d[ -]*?){13,16}\\b",
+                "Please enter a valid credit card number (13 to 16-digit numeric value): ", scanner);
+        date = validateInput(date, "^(0[1-9]|1[0-2])\\/\\d{2}$",
+                "Please enter a valid expiry date, make sure to use the 'MM/yy' format (e.g., 01/23): ", scanner);
+        String cvv = validateInput(Integer.toString(pin), "^\\d{3}$",
+                "Please enter a valid CVV, make sure to enter a 3-digit code from the back of your card: ", scanner);
+        pin = Integer.parseInt(cvv);
         Date expDate = parseDate(date);
         user.setUserCard(cardNumber, expDate, pin);
         uploadData();
@@ -87,23 +94,26 @@ public class Authenticator extends DataManager {
     }
     
     public boolean validateInfo(Info info) {
-        Scanner scanner = new Scanner(System.in);
-        // Validate name
-        String name = validateInput(info.getName(), "^[A-Za-z- ']+$", "Please enter a valid name: ",scanner);
-        info.setName(name);
-    
+        scanner = new Scanner(System.in);
+        if (info.getName() != null && info.getAddress() != null) {
+            // Validate name
+            String name = validateInput(info.getName(), "^[A-Za-z- ']+$", "Please enter a valid name: ", scanner);
+            info.setName(name);
+            // Validate shipping address
+            String address = validateInput(info.getAddress(), "^[A-Za-z0-9- ',]+$",
+                    "Please enter a valid shipping address: ", scanner);
+            info.setAddress(address);
+        }
         // Validate email
-        String email = validateInput(info.getEmail(), "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$", "Please enter a valid email address: ",scanner);
+        String email = validateInput(info.getEmail(), "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$",
+                "Please enter a valid email address: ", scanner);
         info.setEmail(email);
     
         // Validate password
-        String password = validateInput(info.getPassword(), "^[A-Za-z0-9]{6,}$", "Please enter a valid password (at least 6 characters): ", scanner);
+        String password = validateInput(info.getPassword(), "^[A-Za-z0-9]{6,}$",
+                "Please enter a valid password (at least 6 characters): ", scanner);
         info.setPassword(password);
     
-        // Validate shipping address
-        String address = validateInput(info.getAddress(), "^[A-Za-z0-9- ',]+$", "Please enter a valid shipping address: ",scanner);
-        info.setAddress(address);
-
         return users.containsKey(info.getEmail());
     }
 
