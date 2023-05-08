@@ -85,7 +85,7 @@ public class Order {
         System.out.printf("%-20s%d\n", "Items", items);
         System.out.printf("%-20s%.2f EGP\n", "Delivery Fee", deliveryFee);
         if(discount>0){System.out.printf("%-20s%.2f EGP\n", "Discount: ", discount);}
-        System.out.println("Order Total:");
+        System.out.print("Order Total:");
         System.out.printf("%.2f\n", orderTotal);
     }
 

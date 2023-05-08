@@ -9,9 +9,7 @@ import java.util.HashMap;
 public class ShoppingCart {
     private HashMap<Product,Integer> products = new HashMap<Product, Integer>();
     private double totalPrice=0;
-    private double discount = 0;
     private CartObserver observer;
-
     public HashMap<Product, Integer> getProducts() {
         return products;
     }
@@ -31,15 +29,6 @@ public class ShoppingCart {
     public double getTotalPrice() {
         return totalPrice;
     }
-    
-    public double getDiscount() {
-        return discount;
-    }
-    
-    public void setDiscount(double discount) {
-        this.discount=discount;
-    }
-
     public void setTotalPrice(double totalPrice) {
         this.totalPrice = totalPrice;
     }

@@ -125,35 +125,28 @@ public class Controller {
         System.out.println("Credit Card Was Updated");
     }
     
-    private void redeemVoucher() {
+    private void redeemVoucher(Order order) {
         while (true) {
-            System.out.println("DO YOU WANT TO REDEEM A VOUCHER? (YES):(NO)");
-            String vAnswer = scanner.nextLine();
-            if (vAnswer.equals("YES") && activeUser.getUserCart().getTotalPrice() > 0) {
-                
-                if (!activeUser.getVouchers().isEmpty()) {
+            if (activeUser.getUserCart().getTotalPrice() > 0 && !activeUser.getVouchers().isEmpty()) {
                     System.out.println("Available Vouchers:");
                     displayVouchers(activeUser.getVouchers());
-                    System.out.println(activeUser.getVouchers().get(choice-1).getAmount());
-                    System.out.println(activeUser.getUserCart().getTotalPrice());
                     System.out.println("PLEASE ENTER VOUCHER NUMBER: ");
                     choice = scanner.nextInt();
                     if(activeUser.getVouchers().get(choice-1).getAmount()>=activeUser.getUserCart().getTotalPrice()){
-                        activeUser.getUserCart().setDiscount(activeUser.getUserCart().getTotalPrice());
+                        order.setDiscount(activeUser.getUserCart().getTotalPrice());
                         activeUser.getVouchers().get(choice-1).setAmount(activeUser.getVouchers().get(choice-1).getAmount()-activeUser.getUserCart().getTotalPrice());
                     }else{
-                        activeUser.getUserCart().setDiscount(activeUser.getVouchers().get(choice-1).getAmount());
+                        order.setDiscount(activeUser.getVouchers().get(choice-1).getAmount());
                         activeUser.getVouchers().remove(choice - 1);
                     }
+                    System.out.println("DO YOU WANT TO REDEEM ANOTHER VOUCHER? (YES):(NO)");
+                    String vAnswer = scanner.nextLine();
+                    if(vAnswer.equals("NO")){
+                        break;
+                    }
                     
-                } else {
-                    System.out.println("No Vouchers Available.");
-                    break;
-                }
-            }else if(activeUser.getUserCart().getTotalPrice()==0){
+            }else{
                 System.out.println("CANT ADD VOUCHER TO YOUR ORDER");
-                break;
-            }else {
                 break;
             }
         }
@@ -213,19 +206,51 @@ public class Controller {
         }
         if (activeUser.getUserCart().checkOut(payment)) {
             scanner.nextLine();
-            redeemVoucher();
-            order.setDiscount(activeUser.getUserCart().getDiscount());
+            while(true){
+                System.out.println("DO YOU WANT TO REDEEM (VOUCHER):(LOYALITYPOINTES):(EXIT) ");
+                String answer=scanner.nextLine();
+                if(answer.equals("VOUCHER")){
+                    redeemVoucher(order);
+                    break;
+                }else if(answer.equals("LOYALITYPOINTES")){
+                    redeemLoaylity(order);
+                    break;
+                }else if(answer.equals("EXIT")){
+                    break;
+                }else{
+                    continue;
+                }
+            }
             order.displaySummary();
             System.out.println("DO YOU WANT TO CONFIRM? (YES):(NO)");
             String cAnswer = scanner.nextLine();
             if (cAnswer.equals("YES")) {
                 activeUser.getPrevOrders().addOrder(order);
+                activeUser.setLoyaltyPoints(calculateLoyaltyPoints(order.getTotalPrice()));
                 activeUser.getUserCart().emptyCart();
                 System.out.println("Checkout Successfully");
             }
         } else {
             System.out.println("Error In Payment");
         }
+    }
+    public int calculateLoyaltyPoints(Double orderTotal) {
+        int loyaltyPoints = 0;
+        int dollarPerPoint = 20;
+        int intervals =  (int) (orderTotal / dollarPerPoint);
+        loyaltyPoints = intervals;
+        System.out.println(loyaltyPoints);
+        return loyaltyPoints;
+    }
+    public void redeemLoaylity(Order order){
+        int pointsPerDollar = 20;
+        int loyaltyPoints=activeUser.getLoyaltyPoints();
+        double orderTotal=order.getTotalPrice();
+        double discountAmount = loyaltyPoints * pointsPerDollar;
+        if (discountAmount > orderTotal) {
+            discountAmount = orderTotal;
+        }
+        order.setDiscount(discountAmount);       
     }
 
     private void prevOrders(){
