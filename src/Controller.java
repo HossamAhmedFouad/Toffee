@@ -2,11 +2,7 @@ import PaymentSystem.CashOnDelivery;
 import PaymentSystem.Ewallet;
 import PaymentSystem.Payment;
 import Products.Inventory;
-import UserData.Authenticator;
-import UserData.Info;
-import UserData.Order;
-import UserData.User;
-import UserData.Voucher;
+import UserData.*;
 
 import java.sql.Date;
 import java.util.HashMap;
@@ -20,6 +16,8 @@ public class Controller {
     private Authenticator authenticator;
     private boolean loggedUser;
     private User activeUser;
+
+    private Admin admin;
 
     public Controller(Inventory inventory, Authenticator authenticator) {
         this.inventory = inventory;
@@ -213,12 +211,10 @@ public class Controller {
                     redeemVoucher(order);
                     break;
                 }else if(answer.equals("LOYALITYPOINTES")){
-                    redeemLoaylity(order);
+                    redeemLoyalty(order);
                     break;
                 }else if(answer.equals("EXIT")){
                     break;
-                }else{
-                    continue;
                 }
             }
             order.displaySummary();
@@ -236,14 +232,14 @@ public class Controller {
     }
     public int calculateLoyaltyPoints(Double orderTotal) {
         int loyaltyPoints = 0;
-        int dollarPerPoint = 20;
+        int dollarPerPoint = inventory.getLoyalty();
         int intervals =  (int) (orderTotal / dollarPerPoint);
         loyaltyPoints = intervals;
         System.out.println(loyaltyPoints);
         return loyaltyPoints;
     }
-    public void redeemLoaylity(Order order){
-        int pointsPerDollar = 20;
+    public void redeemLoyalty(Order order){
+        int pointsPerDollar = inventory.getLoyalty();
         int loyaltyPoints=activeUser.getLoyaltyPoints();
         double orderTotal=order.getTotalPrice();
         double discountAmount = loyaltyPoints * pointsPerDollar;

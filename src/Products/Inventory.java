@@ -10,6 +10,7 @@ import UserData.Voucher;
 public class Inventory extends DataManager implements CartObserver{
     private List<Product> products;
     private List<Voucher> vouchers;
+    private int loyalty = 20;
     
     public void addProduct(Product product){
         products.add(product);
@@ -127,6 +128,14 @@ public class Inventory extends DataManager implements CartObserver{
             Double amount = Double.parseDouble(data[1]);
             vouchers.add(new Voucher(code, amount));
         }
+    }
+
+    public int getLoyalty(){
+        return loyalty;
+    }
+
+    public void setLoyalty(int loyalty){
+        this.loyalty = loyalty;
     }
 
     @Override

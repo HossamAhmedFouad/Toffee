@@ -9,7 +9,7 @@ public class Product {
     private String category;
     private String brand;
     private String unitType;
-    private Availability status;
+    private Availability status = Availability.onSale;
     private double discountPercentage;
     private int quantity;
 
@@ -23,7 +23,6 @@ public class Product {
         this.brand = brand;
         this.unitType = unitType;
         this.quantity = quantity;
-        status = Availability.onSale;
     }
 
     /**

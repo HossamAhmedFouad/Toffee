@@ -15,6 +15,11 @@ import java.util.regex.Matcher;
 
 public class Authenticator extends DataManager {
     private String otp;
+
+    public HashMap<String, User> getUsers() {
+        return users;
+    }
+
     private HashMap<String, User> users;
     
     public boolean validateCard(Card card) {
