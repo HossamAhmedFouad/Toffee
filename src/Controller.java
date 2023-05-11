@@ -98,6 +98,7 @@ public class Controller {
         if (loggedUser) {
             System.out.println("2 - View Previous Orders");
             System.out.println("3 - Update Credit Card Details");
+            System.out.println("4 - Exit");
         }
 
         if(loggedAdmin){
@@ -143,7 +144,7 @@ public class Controller {
         while (true) {
             if (activeUser.getUserCart().getTotalPrice() > 0 && !activeUser.getVouchers().isEmpty()) {
                     System.out.println("Available Vouchers:");
-                    displayVouchers(activeUser.getVouchers());
+                    displayVouchers(activeUser.getVouchers(),true);
                     System.out.println("PLEASE ENTER VOUCHER NUMBER: ");
                     choice = scanner.nextInt();
                     if(activeUser.getVouchers().get(choice-1).getAmount()>=activeUser.getUserCart().getTotalPrice()){
@@ -390,7 +391,7 @@ public class Controller {
                             viewCart();
                         } else if (choice == 3) {
                             buyVoucher();
-                            displayVouchers(activeUser.getVouchers());
+                            displayVouchers(activeUser.getVouchers(),true);
                         } else if (choice == 4) {
                             break;
                         }
@@ -407,6 +408,8 @@ public class Controller {
                         prevOrders();
                     }else if(choice==3){
                         updateCard();
+                    }else if(choice==4){
+                        break;
                     }
 
                 }else if(loggedAdmin){
@@ -436,23 +439,31 @@ public class Controller {
         }
     }
 
-    private void displayVouchers(List<Voucher> vouchers) {
+    private void displayVouchers(List<Voucher> vouchers,boolean displayCode) {
 
         if (vouchers.isEmpty()) {
             System.out.println("No vouchers available.");
             return;
         }
         int cnt = 1;
-        String format = "%-5s %-20s $%-10s\n";
-        System.out.format(format, "No.", "Voucher Code", "Amount");
-        for (Voucher voucher : vouchers) {
-            System.out.format(format, cnt++, voucher.getCode(), String.format("%.2f", voucher.getAmount()));
+        if(displayCode==true){
+            String format = "%-5s %-20s $%-10s\n";
+            System.out.format(format, "No.", "Voucher Code", "Amount");
+            for (Voucher voucher : vouchers) {
+                System.out.format(format, cnt++, voucher.getCode(), String.format("%.2f", voucher.getAmount()));
+            }
+        }else{
+            String format = "%-5s $%-10s\n";
+            System.out.format(format, "No.","Amount");
+            for (Voucher voucher : vouchers) {
+                System.out.format(format, cnt++, String.format("%.2f", voucher.getAmount()));
+            }
         }
     }
     
     private void buyVoucher(){
         while(true){
-            displayVouchers(inventory.getVoucher());
+            displayVouchers(inventory.getVoucher(),false);
             choice=scanner.nextInt();
             if(choice>=0&&choice<=inventory.getVoucher().size()){
                 activeUser.addVouchers(inventory.getVoucher().get(choice-1));
