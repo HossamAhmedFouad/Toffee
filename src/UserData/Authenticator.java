@@ -16,11 +16,17 @@ import java.util.regex.Matcher;
 public class Authenticator extends DataManager {
     private String otp;
 
+    private HashMap<String, Admin> admins;
+
+    private HashMap<String, User> users;
+
     public HashMap<String, User> getUsers() {
         return users;
     }
 
-    private HashMap<String, User> users;
+    public HashMap<String, Admin> getAdmins() {
+        return admins;
+    }
     
     public boolean validateCard(Card card) {
         Date today = new Date(System.currentTimeMillis());
@@ -94,11 +100,19 @@ public class Authenticator extends DataManager {
         return users.get(info.getEmail());
     }
 
-    public boolean validatePass(Info info) {
+    public Admin getAdmin(Info info){
+        return admins.get(info.getEmail());
+    }
+
+    public boolean validateAdminPass(Info info) {
+        return admins.get(info.getEmail()).getInfo().getPassword().equals(info.getPassword());
+    }
+    public boolean validateUserPass(Info info) {
         return users.get(info.getEmail()).getUserInfo().getPassword().equals(info.getPassword());
     }
-    
-    public boolean validateInfo(Info info) {
+
+
+    public void validation(Info info){
         scanner = new Scanner(System.in);
         if (info.getName() != null && info.getAddress() != null) {
             // Validate name
@@ -113,13 +127,22 @@ public class Authenticator extends DataManager {
         String email = validateInput(info.getEmail(), "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$",
                 "Please enter a valid email address: ", scanner);
         info.setEmail(email);
-    
+
         // Validate password
         String password = validateInput(info.getPassword(), "^[A-Za-z0-9]{6,}$",
                 "Please enter a valid password (at least 6 characters): ", scanner);
         info.setPassword(password);
-    
+    }
+
+
+    public boolean validateUser(Info info) {
+        validation(info);
         return users.containsKey(info.getEmail());
+    }
+
+    public boolean validateAdmin(Info info){
+        validation(info);
+        return admins.containsKey(info.getEmail());
     }
 
     @Override
@@ -152,8 +175,10 @@ public class Authenticator extends DataManager {
     @Override
     protected void loadData() {
         List<String> userLines = readFromFile(System.getProperty("user.dir") + "/src/UserData/users.csv");
+        List<String> adminLines = readFromFile(System.getProperty("user.dir") + "/src/UserData/admins.csv");
         List<String> cardLines = readFromFile(System.getProperty("user.dir") + "/src/UserData/cards.csv");
         users = new HashMap<String, User>();
+        admins = new HashMap<String, Admin>();
         for (String line : userLines) {
             String[] data = line.split(",", 4);
             String name = data[0];
@@ -174,5 +199,16 @@ public class Authenticator extends DataManager {
             Date date = parseDate(expDate);
             users.get(email).setUserCard(cardNumber, date, pin);
         }
+        for (String line : adminLines) {
+            String[] data = line.split(",", 4);
+            String name = data[0];
+            String email = data[1];
+            String password = data[2];
+            String address = data[3];
+            Info info = new Info(name, email, password, address);
+            Admin admin = new Admin(info);
+            admins.put(info.getEmail(), admin);
+        }
+
     }
 }

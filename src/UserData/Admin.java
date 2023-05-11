@@ -10,17 +10,42 @@ import java.util.Scanner;
 
 public class Admin {
 
+    private Info info;
     private Inventory inventory;
-    private String username,password;
     private Authenticator authenticator;
+
+    public Info getInfo() {
+        return info;
+    }
+
+    public void setInfo(Info info) {
+        this.info = info;
+    }
+
+    public Inventory getInventory() {
+        return inventory;
+    }
+
+    public void setInventory(Inventory inventory) {
+        this.inventory = inventory;
+    }
+
+    public Authenticator getAuthenticator() {
+        return authenticator;
+    }
+
+    public void setAuthenticator(Authenticator authenticator) {
+        this.authenticator = authenticator;
+    }
+
     private Scanner scanner;
 
 
-    public Admin(String username,String password,Inventory inventory,Authenticator authenticator){
-        this.username =username;
-        this.password = password;
-        this.inventory = inventory;
-        this.authenticator = authenticator;
+
+
+
+    public Admin(Info info){
+        this.info = info;
     }
 
     Product loadProduct(){
@@ -29,13 +54,13 @@ public class Admin {
         Availability status = Availability.onSale;
         int quantity,choice;
         scanner.nextLine();
-        System.out.println("Name: "); name = scanner.nextLine();
-        System.out.println("Category: "); category = scanner.nextLine();
-        System.out.println("Brand: "); brand = scanner.nextLine();
-        System.out.println("Unit Type: "); unitType = scanner.nextLine();
-        System.out.println("Price: "); price = scanner.nextDouble();
-        System.out.println("Discount Percentage: "); discountPercentage=scanner.nextDouble();
-        System.out.println("Quantity: "); quantity = scanner.nextInt();
+        System.out.print("Name: "); name = scanner.nextLine();
+        System.out.print("Category: "); category = scanner.nextLine();
+        System.out.print("Brand: "); brand = scanner.nextLine();
+        System.out.print("Unit Type: "); unitType = scanner.nextLine();
+        System.out.print("Price: "); price = scanner.nextDouble();
+        System.out.print("Discount Percentage: "); discountPercentage=scanner.nextDouble();
+        System.out.print("Quantity: "); quantity = scanner.nextInt();
         System.out.println("PLEASE CHOOSE AVAILABILITY");
         System.out.println("1 - On Sale");
         System.out.println("2 - Not On Sale");
@@ -57,7 +82,7 @@ public class Admin {
             System.out.println("PLEASE CHOOSE AN OPTION");
             System.out.println("1 - Add Product To Catalog");
             System.out.println("2 - Remove Product From Catalog");
-            scanner.nextLine();
+            System.out.println("3 - Go Back");
             choice = scanner.nextInt();
             if(choice==1){
                 inventory.addProduct(loadProduct());
@@ -68,12 +93,14 @@ public class Admin {
                 choice = scanner.nextInt();
                 if(choice>0 && choice<=inventory.getProducts().size()) inventory.getProducts().remove(choice-1);
                 break;
+            }else if(choice==3){
+                break;
             }
         }
 
     }
 
-    public void updateProduct(Product product){
+    public void updateProduct(){
         inventory.display();
         System.out.println("Select Product ID To Update");
         int choice = scanner.nextInt();

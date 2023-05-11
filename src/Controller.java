@@ -19,6 +19,9 @@ public class Controller {
 
     private Admin admin;
 
+    private boolean loggedAdmin;
+
+
     public Controller(Inventory inventory, Authenticator authenticator) {
         this.inventory = inventory;
         this.authenticator = authenticator;
@@ -39,7 +42,7 @@ public class Controller {
 
         Info info = new Info(name,email,password,shippingAddress);
 
-        if (authenticator.validateInfo(info)) {
+        if (authenticator.validateUser(info)) {
             System.out.println("Error: Email Already Used");
             return;
         }
@@ -94,11 +97,22 @@ public class Controller {
             System.out.println("2 - View Previous Orders");
             System.out.println("3 - Update Credit Card Details");
         }
-        if (!loggedUser) {
+
+        if(loggedAdmin){
+            System.out.println("2 - Update Catalog");
+            System.out.println("3 - Update Product");
+            System.out.println("4 - View Orders");
+            System.out.println("5 - Suspend a User");
+            System.out.println("6 - View Statistics");
+            System.out.println("7 - Exit");
+        }
+
+        if (!loggedUser && !loggedAdmin) {
             System.out.println("2 - Register");
             System.out.println("3 - Log In");
+            System.out.println("4 - Exit");
         }
-        System.out.println("4 - Exit");
+
     }
     
     private void updateCard() {
@@ -150,7 +164,7 @@ public class Controller {
         }
     }
 
-    private void login() {
+    private Info takeInfo(){
         String email, password, input;
         scanner.nextLine();
         System.out.print("Enter email: ");
@@ -162,11 +176,45 @@ public class Controller {
         Info info = new Info();
         info.setEmail(email);
         info.setPassword(password);
-        if (authenticator.validateInfo(info) && authenticator.validatePass(info)) {
+        return info;
+    }
+
+    private void login(){
+        while (true){
+            System.out.println("Please Choice Option");
+            System.out.println("1 - User Login");
+            System.out.println("2 - Admin Login");
+            int choice = scanner.nextInt();
+            if(choice==1){
+                loginUser();
+                break;
+            }else if(choice==2){
+                loginAdmin();
+                break;
+            }
+        }
+    }
+
+    private void loginUser() {
+        Info info = takeInfo();
+        if (authenticator.validateUser(info) && authenticator.validateUserPass(info)) {
             loggedUser = true;
             activeUser = authenticator.getUser(info);
             activeUser.getUserCart().setObserver(inventory);
             System.out.println("Login Has Been Successful, Welcome " + activeUser.getUserInfo().getName());
+        } else {
+            System.out.println("Invalid Credentials");
+        }
+    }
+
+    private void loginAdmin(){
+        Info info = takeInfo();
+        if (authenticator.validateAdmin(info) && authenticator.validateAdminPass(info)) {
+            loggedAdmin = true;
+            admin = authenticator.getAdmin(info);
+            admin.setInventory(inventory);
+            admin.setAuthenticator(authenticator);
+            System.out.println("Login Has Been Successful, Welcome Admin");
         } else {
             System.out.println("Invalid Credentials");
         }
@@ -341,7 +389,7 @@ public class Controller {
                         } else if (choice == 3) {
                             buyVoucher();
                             displayVouchers(activeUser.getVouchers());
-                        }else if (choice == 4) {
+                        } else if (choice == 4) {
                             break;
                         }
                     } else if (choice == 4) {
@@ -349,24 +397,37 @@ public class Controller {
                     } else {
                         System.out.println("You Must Be A User To Do This Action");
                     }
-                    
+
                 }
-            } else if (choice == 4) {
-                scanner.close();
-                break;
-            }
-            else{
+            }else{
                 if(loggedUser){
                     if(choice==2){
                         prevOrders();
                     }else if(choice==3){
                         updateCard();
                     }
+
+                }else if(loggedAdmin){
+                    if(choice==2){
+                        admin.updateCatalog();
+                    }else if(choice==3){
+                        admin.updateProduct();
+                    }else if(choice==4){
+                        //TODO: View All Order
+                    }else if(choice==5){
+                        admin.suspendUser();
+                    }else if(choice==6){
+                        //TODO: View Statistics
+                    }else if(choice==7){
+                        break;
+                    }
                 }else{
                     if(choice==2){
                         register();
                     }else if(choice==3){
                         login();
+                    }else if(choice==4){
+                        break;
                     }
                 }
             }
