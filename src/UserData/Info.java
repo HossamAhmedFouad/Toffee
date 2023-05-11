@@ -1,7 +1,7 @@
 package UserData;
 
 public class Info {
-    private String name, email, password, address, otp;
+    private String name, email, password, address;
 
     public Info(String name, String email, String password, String address) {
         this.name = name;
@@ -14,12 +14,6 @@ public class Info {
         
     }
 
-    public String getOTP() {
-        return otp;
-    }
-    public void setOTP(String otp){
-        this.otp = otp;
-    }
     public String getName() {
         return name;
     }

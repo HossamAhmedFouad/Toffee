@@ -46,11 +46,11 @@ public class Controller {
             System.out.println("Error: Email Already Used");
             return;
         }
-        info.setOTP(authenticator.generateOTP());
+        int otp = Authenticator.generateOTP();
+        Authenticator.SendOTP(info.getEmail(), otp);
         System.out.println("Please Enter OTP Sent To Your Email Address: " + info.getEmail());
         String input = scanner.nextLine();
-        System.out.println(info.getOTP());
-        while(!input.equals(info.getOTP())) {
+        while(!input.equals(Integer.toString(otp))) {
             System.out.println("Incorrect OTP...");
             System.out.println("1 - Resend OTP");
             System.out.println("2 - Try Again");
@@ -63,8 +63,10 @@ public class Controller {
                     System.out.print("Enter Email: ");
                     email = scanner.nextLine();
                     info.setEmail(email);
+                    authenticator.validateUser(info);
                 }
-                info.setOTP(authenticator.generateOTP());
+                otp = Authenticator.generateOTP();
+                Authenticator.SendOTP(info.getEmail(), otp);
                 System.out.println("Please Enter OTP Sent To Your Email Address: " + info.getEmail());
                 input = scanner.nextLine();
             } else if (choice == 2) {

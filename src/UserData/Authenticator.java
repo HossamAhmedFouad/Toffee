@@ -1,8 +1,10 @@
 package UserData;
-
+import javax.mail.*;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
+import java.util.Properties;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Random;
 import java.util.Scanner;
 import java.util.ArrayList;
 import java.util.Date;
@@ -14,7 +16,6 @@ import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
 public class Authenticator extends DataManager {
-    private String otp;
 
     private HashMap<String, Admin> admins;
 
@@ -37,20 +38,41 @@ public class Authenticator extends DataManager {
         return true;
     }
 
-    public String generateOTP() {
-        //TODO: generate otp and send it to the email
-        String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-        int length = 6;
-        Random random = new Random();
-        StringBuilder builder = new StringBuilder();
-        for (int i = 0; i < length; i++) {
-            int index = random.nextInt(CHARACTERS.length());
-            char randomChar = CHARACTERS.charAt(index);
-            builder.append(randomChar);
+    public static boolean SendOTP(String email, int code) {
+        String host = "smtp.gmail.com";
+        String username = "fcai.toffeeshop@gmail.com";
+        String password = "dfpzbhgihyfxtbjp";
+        Properties props = new Properties();
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.starttls.enable", "true");
+        props.put("mail.smtp.host", host);
+        props.put("mail.smtp.port", "587");
+        Session session = Session.getInstance(props, new javax.mail.Authenticator() {
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(username, password);
+            }
+        });
+
+        try {
+            Message message = new MimeMessage(session);
+
+            message.setFrom(new InternetAddress(username));
+
+            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(email));
+
+            message.setSubject("TOFFE SHOP VERIFICATION CODE");
+            message.setText("Your OTP IS : " + code);
+
+            Transport.send(message);
+            System.out.println("Email sent successfully!");
+            return true;
+        } catch (MessagingException e) {
+            throw new RuntimeException(e);
         }
-        otp = builder.toString();
-        System.out.println(otp);
-        return otp;
+    }
+    
+    public static int generateOTP() {
+        return (int) (Math.random() * 900000) + 100000;
     }
 
     public void addUser(Info info) {
@@ -107,6 +129,7 @@ public class Authenticator extends DataManager {
     public boolean validateAdminPass(Info info) {
         return admins.get(info.getEmail()).getInfo().getPassword().equals(info.getPassword());
     }
+    
     public boolean validateUserPass(Info info) {
         return users.get(info.getEmail()).getUserInfo().getPassword().equals(info.getPassword());
     }
