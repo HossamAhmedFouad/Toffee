@@ -108,6 +108,7 @@ public class Order {
         }
         
         System.out.printf("%-20s%.2f EGP\n", "Order Total", orderTotal);
+        System.out.printf("%-20s%s\n", "Order Date:", date);
     }
 
     public int calcLoyalty(){

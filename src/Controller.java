@@ -108,8 +108,7 @@ public class Controller {
             System.out.println("3 - Update Product");
             System.out.println("4 - View Orders");
             System.out.println("5 - Change User Status");
-            System.out.println("6 - View Statistics");
-            System.out.println("7 - Exit");
+            System.out.println("6 - Exit");
         }
 
         if (!loggedUser && !loggedAdmin) {
@@ -435,8 +434,6 @@ public class Controller {
                     }else if(choice==5){
                         admin.changeUserStatus();
                     }else if(choice==6){
-                        //TODO: View Statistics
-                    }else if(choice==7){
                         break;
                     }
                 }else{

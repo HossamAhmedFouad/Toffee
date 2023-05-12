@@ -118,21 +118,23 @@ public class Admin{
             if (!user.getPrevOrders().getOrders().isEmpty()) {
                 for (Order prevOrder : user.getPrevOrders().getOrders()) {
                     prevOrder.displaySummary();
+                    System.out.println("===============================================");
                 }
             }
             System.out.println();
         }
     }
 
-    public void changeUserStatus(){
+    public void changeUserStatus() {
         int idx = 1;
         List<String> mails = new ArrayList<>();
         for (User usr : authenticator.getUsers().values()) {
-            String formattedOutput = String.format("%-5s %-20s %s", idx, usr.getUserInfo().getName(), usr.getUserInfo().getEmail());
+            String formattedOutput = String.format("%-5s %-20s %s", idx, usr.getUserInfo().getName(),
+                    usr.getUserInfo().getEmail());
             System.out.println(formattedOutput);
             mails.add(usr.getUserInfo().getEmail());
             idx++;
-        }        
+        }
         System.out.println("Please Select A User");
         int choice = scanner.nextInt();
         if (choice <= 0 || choice > mails.size()) {
@@ -147,7 +149,7 @@ public class Admin{
         }
         scanner.nextLine();
         String ans = scanner.nextLine();
-        if(ans.equals("N")) {
+        if (ans.equals("N")) {
             return;
         }
         authenticator.getUsers().get(mails.get(choice - 1)).setStatus(!userStatus);
