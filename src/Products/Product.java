@@ -19,7 +19,7 @@ public class Product {
      * Constructor
      */
     public Product(String name, double price, String category, String brand, String unitType, int quantity) {
-        this.id++;
+        id++;
         productID = id;
         this.name = name;
         this.price = price;
@@ -28,13 +28,25 @@ public class Product {
         this.unitType = unitType;
         this.quantity = quantity;
     }
+
+
     /**
      * Getters and setters
      */
-    public int getID() {
+    public int getProductID() {
         return productID;
     }
+    public void setProductID(int ID) {
+        productID = ID;
+    }
     
+    public static void setID(int ID) {
+        id = ID;
+    }
+
+    public static int getID() {
+        return id;
+    }
     
     public String getName() {
         return name;

@@ -30,7 +30,6 @@ public class Authenticator extends DataManager implements Observer {
     public static void setInventory(Inventory inv) {
         inventory = inv;
     }
-    
     public HashMap<String, User> getUsers() {
         return users;
     }
@@ -49,14 +48,15 @@ public class Authenticator extends DataManager implements Observer {
     }
 
     public static boolean SendOTP(String email, int code) {
+        System.out.println("Please wait while sending OTP to your email address.....");
         String host = "smtp.gmail.com";
-        String username = "fcai.toffeeshop@gmail.com";
-        String password = "dfpzbhgihyfxtbjp";
+        String username = "fcaitoffeeshopwork@gmail.com";
+        String password = "ppvjxavkmrcpmtvk";
         Properties props = new Properties();
         props.put("mail.smtp.auth", "true");
         props.put("mail.smtp.starttls.enable", "true");
         props.put("mail.smtp.host", host);
-        props.put("mail.smtp.port", "587");
+        props.put("mail.smtp.port", 587);
         Session session = Session.getInstance(props, new javax.mail.Authenticator() {
             protected PasswordAuthentication getPasswordAuthentication() {
                 return new PasswordAuthentication(username, password);
@@ -210,7 +210,7 @@ public class Authenticator extends DataManager implements Observer {
                     String orderDetails = "";
                     for (Map.Entry<Product, Integer> item : prevOrders.getProducts().entrySet()) {
                         int productQuantity = item.getValue();
-                        int productID = item.getKey().getID();
+                        int productID = item.getKey().getProductID();
                         orderDetails += productQuantity + "|" + productID + "/";
                     }
                     Double totalPrice = prevOrders.getTotalPrice();
@@ -257,12 +257,8 @@ public class Authenticator extends DataManager implements Observer {
                 String[] item = items.split("\\|");
                 int quantity = Integer.parseInt(item[0]);
                 int productID = Integer.parseInt(item[1]);
-                for (Product product : inventory.getProducts()) {
-                    if (productID == product.getID()) {
-                        orderProducts.put(product, quantity);
-                        break;
-                    }
-                }
+                Product product = inventory.getProducts().get(productID);
+                orderProducts.put(product, quantity);
             }
             double totalPrice = Double.parseDouble(data[3]);
             String shippingAddress = data[4];
@@ -294,5 +290,9 @@ public class Authenticator extends DataManager implements Observer {
     @Override
     public void onUpdate() {
         uploadData();
+    }
+    @Override
+    public void onLoad() {
+        loadData();
     }
 }

@@ -473,11 +473,16 @@ public class Controller {
     
     private void buyVoucher(){
         while(true){
-            displayVouchers(inventory.getVoucher(),false);
-            choice=scanner.nextInt();
-            if(choice>=0&&choice<=inventory.getVoucher().size()){
-                activeUser.addVouchers(inventory.getVoucher().get(choice-1));
-                inventory.getVoucher().remove(choice-1);
+            displayVouchers(inventory.getVouchers(),false);
+            choice = scanner.nextInt();
+            if (choice >= 0 && choice <= inventory.getVouchers().size()) {
+                Payment payment = new Ewallet(activeUser, authenticator);
+                if (!payment.payOrder()) {
+                    System.out.println("Payment Error...");
+                    return;
+                }
+                activeUser.addVouchers(inventory.getVouchers().get(choice - 1));
+                inventory.removeVoucher(choice - 1);
                 break;
             }
         }

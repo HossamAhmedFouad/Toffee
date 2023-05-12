@@ -14,10 +14,6 @@ public abstract class DataManager {
     
     protected FileWriter myWriter;
     
-    public DataManager() {
-        loadData();
-    }
-
     protected abstract void uploadData();
     
     protected abstract void loadData();

@@ -16,7 +16,7 @@ public class Order {
     private double discount;
     
     public Order(double totalPrice, Date date, String shipAddress, HashMap<Product, Integer> products) {
-        this.id++;
+        id++;
         orderID = id;
         this.totalPrice = totalPrice;
         this.date = date;
@@ -112,7 +112,6 @@ public class Order {
     }
 
     public int calcLoyalty(){
-        //TODO : Calculate loyalty points
         return 0;
     }
 }

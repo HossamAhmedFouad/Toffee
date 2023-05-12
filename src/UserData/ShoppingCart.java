@@ -12,6 +12,7 @@ public class ShoppingCart {
     private HashMap<Product,Integer> products = new HashMap<Product, Integer>();
     private double totalPrice = 0;
     private List<Observer> observers;
+    
     public HashMap<Product, Integer> getProducts() {
         return products;
     }
