@@ -250,7 +250,6 @@ public class Authenticator extends DataManager implements CartObserver {
         for (String line : orderLines) {
             String[] data = line.split(",", 6);
             String email = data[0];
-            int orderID = Integer.parseInt(data[1]);
             String[] orderDetails = data[2].split("/");
             HashMap<Product,Integer> orderProducts = new HashMap<Product,Integer>();
             for (String items : orderDetails) {
@@ -268,7 +267,6 @@ public class Authenticator extends DataManager implements CartObserver {
             String shippingAddress = data[4];
             Date shipDate = parseDate(data[5],"yyyy-MM-dd HH:mm");
             Order prevOrder = new Order(totalPrice, shipDate, shippingAddress, orderProducts);
-            prevOrder.setID(orderID);
             users.get(email).getPrevOrders().addOrder(prevOrder);
         }
         for (String line : cardLines) {

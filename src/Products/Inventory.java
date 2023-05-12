@@ -122,7 +122,6 @@ public class Inventory extends DataManager implements CartObserver{
             String unitType = data[5];
             int quantity = Integer.parseInt(data[6]);
             Product product = new Product(name, price, category, brand, unitType, quantity);
-            product.setID(id);
             products.add(product);
         }
     

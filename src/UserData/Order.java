@@ -29,10 +29,6 @@ public class Order {
         return orderID;
     }
     
-    public void setID(int id) {
-        orderID = id;
-    }
-    
     public Order(Order other){
         this.totalPrice = other.totalPrice;
         this.date = other.date;

@@ -23,10 +23,6 @@ public class ShoppingCart {
             }
         }
         this.products = otherProducts;
-        totalPrice = 0;
-        for (Product product : this.products.keySet()) {
-            totalPrice += product.getPrice();
-        }
         return true;
     }
     
@@ -113,7 +109,7 @@ public class ShoppingCart {
             return false;
         }
         products.put(product, products.getOrDefault(product, 0) + quantity);
-        totalPrice += product.getPrice();
+        totalPrice += (product.getPrice() * quantity);
         return true;
     }
     //this two fun can put in controller instead of here
