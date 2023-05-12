@@ -6,6 +6,7 @@ import Products.Product;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ShoppingCart {
     private HashMap<Product,Integer> products = new HashMap<Product, Integer>();
@@ -15,12 +16,18 @@ public class ShoppingCart {
         return products;
     }
 
-    public void setProducts(HashMap<Product, Integer> products) {
-        this.products = products;
+    public boolean setProducts(HashMap<Product, Integer> otherProducts) {
+        for (Map.Entry<Product, Integer> entry : otherProducts.entrySet()) {
+            if (!addProduct(entry.getKey(), entry.getValue())) {
+                return false;
+            }
+        }
+        this.products = otherProducts;
         totalPrice = 0;
         for (Product product : this.products.keySet()) {
             totalPrice += product.getPrice();
         }
+        return true;
     }
     
     public void setObservers(List<CartObserver> observers) {
@@ -30,6 +37,7 @@ public class ShoppingCart {
     public double getTotalPrice() {
         return totalPrice;
     }
+    
     public void setTotalPrice(double totalPrice) {
         this.totalPrice = totalPrice;
     }
@@ -41,7 +49,7 @@ public class ShoppingCart {
         }
         for (Product product : products.keySet()) {
             if (idx - 1 == 0) {
-                addProduct(product);
+                addProduct(product,1);
                 break;
             }
             idx--;
@@ -98,15 +106,15 @@ public class ShoppingCart {
         //TODO: checkout and empty cart
     }
 
-    public void addProduct(Product product) {
-        if (product.getStatus() != Availability.outOfStock) {
-            product.setQuantity(product.getQuantity() - 1);
+    public boolean addProduct(Product product, int quantity) {
+        if (product.getStatus() != Availability.outOfStock && product.getQuantity() - quantity >= 0) {
+            product.setQuantity(product.getQuantity() - quantity);
         } else {
-            System.out.println("Product Is Out Of Stock");
-            return;
+            return false;
         }
-        products.put(product, products.getOrDefault(product, 0) + 1);
+        products.put(product, products.getOrDefault(product, 0) + quantity);
         totalPrice += product.getPrice();
+        return true;
     }
     //this two fun can put in controller instead of here
     public void display(){

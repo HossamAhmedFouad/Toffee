@@ -2,6 +2,7 @@ import PaymentSystem.CashOnDelivery;
 import PaymentSystem.Ewallet;
 import PaymentSystem.Payment;
 import Products.Inventory;
+import Products.Product;
 import UserData.*;
 
 import java.sql.Date;
@@ -239,24 +240,25 @@ public class Controller {
             address=activeUser.getUserInfo().getAddress();
         } else if (choice == 2) {
             System.out.println("Enter A New Address");
-            address=scanner.nextLine();
+            scanner.nextLine();
+            address = scanner.nextLine();
         }
         //Payment section
-        Payment payment = null;
-        Date today = new Date(System.currentTimeMillis());
-        Order order = new Order(activeUser.getUserCart().getTotalPrice(), today,address, new HashMap<>(activeUser.getUserCart().getProducts()));
         System.out.println("PLEASE CHOOSE PAYMENT OPTION");
         System.out.println("1 - Cash On Delivery");
         System.out.println("2 - Credit Card");
         System.out.println("3 - Back");
+        Payment payment = null;
         choice = scanner.nextInt();
         if (choice == 1) {
-            payment = new CashOnDelivery(order, activeUser);
+            payment = new CashOnDelivery(activeUser);
         } else if (choice == 2) {
-            payment = new Ewallet(order, activeUser, authenticator);
+            payment = new Ewallet(activeUser, authenticator);
         }else if (choice == 3) {
             return;
         }
+        Date today = new Date(System.currentTimeMillis());
+        Order order = new Order(activeUser.getUserCart().getTotalPrice(), today,address, new HashMap<>(activeUser.getUserCart().getProducts()));
         if (activeUser.getUserCart().checkOut(payment)) {
             scanner.nextLine();
             while(true){
@@ -323,9 +325,13 @@ public class Controller {
                 if(id < 1 || id > activeUser.getPrevOrders().getOrders().size()){
                     System.out.println("INVALID ID NUMBER");
                 }else{
-                    if(choice==1){
-                        Order order = activeUser.getPrevOrders().getOrders().get(id-1);
-                        activeUser.getUserCart().setProducts(order.getProducts());
+                    if (choice == 1) {
+                        Order order = activeUser.getPrevOrders().getOrders().get(id - 1);
+                        HashMap<Product, Integer> productMap = new HashMap<>(order.getProducts());
+                        if (!activeUser.getUserCart().setProducts(productMap)) {
+                            System.out.println("Error: Can't Add Item To The Cart The Product Is Out Of Stock");
+                            return;
+                        }
                         checkOut();
                         return;
                     }else{
@@ -366,12 +372,15 @@ public class Controller {
         scanner.nextLine();
         System.out.println("PLEASE ENTER ITEM NUMBER: ");
         choice = scanner.nextInt();
-        if (choice <= 0 || choice > inventory.getProducts().size() || inventory.getProducts().get(choice - 1).getQuantity() == 0) {
-            System.out.println("Error: Can't Add Item To The Cart");
+        if (choice <= 0 || choice > inventory.getProducts().size()) {
+            System.out.println("Error: Invalid Index.");
             return;
         } 
+        if (!activeUser.getUserCart().addProduct(inventory.getProducts().get(choice - 1), 1)) {
+            System.out.println("Error: Can't Add Item To The Cart The Product Is Out Of Stock");
+            return;
+        }
         System.out.println(inventory.getProducts().get(choice - 1));
-        activeUser.getUserCart().addProduct(inventory.getProducts().get(choice - 1));
     }
 
     public void start() {

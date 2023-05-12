@@ -4,6 +4,7 @@ import Products.Product;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Map;
 
 public class Order {
     private static int id = 0;
@@ -27,9 +28,11 @@ public class Order {
     public int getID() {
         return orderID;
     }
+    
     public void setID(int id) {
         orderID = id;
     }
+    
     public Order(Order other){
         this.totalPrice = other.totalPrice;
         this.date = other.date;
@@ -78,23 +81,38 @@ public class Order {
         return discount;
     }
 
-    public void displaySummary(){
+    public void displaySummary() {
         double subTotal = totalPrice;
-        int items=0;
+        int items = 0;
         double deliveryFee = 20;
         double orderTotal = subTotal + deliveryFee - discount;
-        for (Product product : products.keySet()) {
-            items+=products.get(product);
-        }
+        
         System.out.println("Order Summary:");
         System.out.printf("%-20s%.2f EGP\n", "Sub-total", subTotal);
+        
+        for (Map.Entry<Product, Integer> entry : products.entrySet()) {
+            Product product = entry.getKey();
+            int quantity = entry.getValue();
+            
+            items += quantity;
+            
+            System.out.printf("%-20s%s\n", "Product Name:", product.getName());
+            System.out.printf("%-20s%s\n", "Brand:", product.getBrand());
+            System.out.printf("%-20s%s\n", "Category:", product.getCategory());
+            System.out.printf("%-20s%.2f EGP\n", "Price per Item:", product.getPrice());
+            System.out.printf("%-20s%d\n", "Quantity:", quantity);
+            System.out.println("--------------------------");
+        }
+        
         System.out.printf("%-20s%d\n", "Items", items);
         System.out.printf("%-20s%.2f EGP\n", "Delivery Fee", deliveryFee);
-        if(discount>0){System.out.printf("%-20s%.2f EGP\n", "Discount: ", discount);}
-        System.out.print("Order Total:");
-        System.out.printf("%.2f\n", orderTotal);
+        
+        if (discount > 0) {
+            System.out.printf("%-20s%.2f EGP\n", "Discount:", discount);
+        }
+        
+        System.out.printf("%-20s%.2f EGP\n", "Order Total", orderTotal);
     }
-
 
     public int calcLoyalty(){
         //TODO : Calculate loyalty points

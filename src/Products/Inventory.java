@@ -86,7 +86,6 @@ public class Inventory extends DataManager implements CartObserver{
         voucherLines.add("Code,Amount\n");
         for (Product product : products) {
             int id = product.getID();
-            System.out.println(id);
             String name = product.getName();
             Double price = product.getPrice();
             String category = product.getCategory();

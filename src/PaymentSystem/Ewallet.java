@@ -2,14 +2,13 @@ package PaymentSystem;
 
 import UserData.Authenticator;
 import java.util.Scanner;
-
-import UserData.Order;
 import UserData.User;
 
 public class Ewallet extends Payment {
     Authenticator authenticator;
-    public Ewallet(Order order, User user, Authenticator authenticator) {
-        super(order, user);
+    
+    public Ewallet(User user, Authenticator authenticator) {
+        super(user);
         this.authenticator = authenticator;
     }
 

@@ -30,6 +30,7 @@ public class Authenticator extends DataManager implements CartObserver {
     public static void setInventory(Inventory inv) {
         inventory = inv;
     }
+    
     public HashMap<String, User> getUsers() {
         return users;
     }
@@ -40,7 +41,7 @@ public class Authenticator extends DataManager implements CartObserver {
     
     public boolean validateCard(Card card) {
         Date today = new Date(System.currentTimeMillis());
-        if (card == null || card.getDate().after(today) || !card.getStatus()) {
+        if (card == null || !card.getDate().after(today) || !card.getStatus()) {
             // Card is not valid or status is inactive or user does not have a card
             return false;
         }
@@ -166,7 +167,6 @@ public class Authenticator extends DataManager implements CartObserver {
         info.setPassword(password);
     }
 
-
     public boolean validateUser(Info info) {
         validation(info);
         return users.containsKey(info.getEmail());
@@ -185,6 +185,8 @@ public class Authenticator extends DataManager implements CartObserver {
         userLines.add("Name,Email,Password,Address\n");
         cardLines.add("Email,Card Number,Expiry Date,CVV\n");
         orderLines.add("Email,Order ID,Quantity/ProductID,Total Price,Shipping Address,Date\n");
+        SimpleDateFormat orderDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+        SimpleDateFormat cardDateFormat = new SimpleDateFormat("MM/yy");
         for (Map.Entry<String, User> entry : users.entrySet()) {
             User user = entry.getValue();
             String name = user.getUserInfo().getName();
@@ -196,8 +198,7 @@ public class Authenticator extends DataManager implements CartObserver {
 
             if (user.getUserCard() != null) {
                 String cardNumber = user.getUserCard().getCardNumber();
-                String expDate = (user.getUserCard().getDate().getMonth() + 1) + "/"
-                        + (user.getUserCard().getDate().getYear() - 100);
+                String expDate = cardDateFormat.format(user.getUserCard().getDate());
                 int pin = user.getUserCard().getPin();
                 String cardLine = String.format("%s,%s,%s,%s\n", email, cardNumber, expDate, pin);
                 cardLines.add(cardLine);
@@ -213,9 +214,9 @@ public class Authenticator extends DataManager implements CartObserver {
                     }
                     Double totalPrice = prevOrders.getTotalPrice();
                     String shipAddress = prevOrders.getShipAddress();
-                    String shipDate = (prevOrders.getDate().getYear() + 1900) + "-" + (prevOrders.getDate().getMonth() + 1) + "-"
-                            + (prevOrders.getDate().getDay() + 7);
-                    System.out.println(shipDate);
+                    String shipDate = orderDateFormat.format(prevOrders.getDate());
+                    // String shipDate = (prevOrders.getDate().getYear() + 1900) + "-" + (prevOrders.getDate().getMonth() + 1) + "-"
+                    //         + (prevOrders.getDate().getDay() + 7);
                     String orderLine = String.format("%s,%s,%s,%s,%s,%s\n", email, orderID, orderDetails, totalPrice,
                             shipAddress, shipDate);
                     orderLines.add(orderLine);
@@ -254,7 +255,6 @@ public class Authenticator extends DataManager implements CartObserver {
             HashMap<Product,Integer> orderProducts = new HashMap<Product,Integer>();
             for (String items : orderDetails) {
                 String[] item = items.split("\\|");
-                
                 int quantity = Integer.parseInt(item[0]);
                 int productID = Integer.parseInt(item[1]);
                 for (Product product : inventory.getProducts()) {
@@ -266,7 +266,7 @@ public class Authenticator extends DataManager implements CartObserver {
             }
             double totalPrice = Double.parseDouble(data[3]);
             String shippingAddress = data[4];
-            Date shipDate = parseDate(data[5],"YYY-MM-DD");
+            Date shipDate = parseDate(data[5],"yyyy-MM-dd HH:mm");
             Order prevOrder = new Order(totalPrice, shipDate, shippingAddress, orderProducts);
             prevOrder.setID(orderID);
             users.get(email).getPrevOrders().addOrder(prevOrder);
@@ -290,7 +290,6 @@ public class Authenticator extends DataManager implements CartObserver {
             Admin admin = new Admin(info);
             admins.put(info.getEmail(), admin);
         }
-
     }
 
     @Override

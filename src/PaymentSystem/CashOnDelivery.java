@@ -1,11 +1,10 @@
 package PaymentSystem;
-
-import UserData.Order;
 import UserData.User;
 
 public class CashOnDelivery extends Payment {
-    public CashOnDelivery(Order order, User user) {
-        super(order, user);
+    
+    public CashOnDelivery(User user) {
+        super(user);
     }
 
     @Override

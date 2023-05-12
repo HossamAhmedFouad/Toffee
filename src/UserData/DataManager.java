@@ -8,12 +8,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-import Products.Inventory;
-
 
 public abstract class DataManager {
     protected Scanner scanner;
+    
     protected FileWriter myWriter;
+    
     public DataManager() {
         loadData();
     }
