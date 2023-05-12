@@ -2,6 +2,10 @@ package UserData;
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+
+import Products.Inventory;
+import Products.Product;
+
 import java.util.Properties;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -15,12 +19,17 @@ import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
-public class Authenticator extends DataManager {
+public class Authenticator extends DataManager implements CartObserver {
+
+    private static Inventory inventory;
 
     private HashMap<String, Admin> admins;
 
     private HashMap<String, User> users;
 
+    public static void setInventory(Inventory inv) {
+        inventory = inv;
+    }
     public HashMap<String, User> getUsers() {
         return users;
     }
@@ -80,7 +89,7 @@ public class Authenticator extends DataManager {
         users.put(info.getEmail(), user);
         uploadData();
     }
-    
+
     private String validateInput(String userInput, String regexPattern, String errorMessage, Scanner scanner) {
         Pattern regex = Pattern.compile(regexPattern);
         Matcher matcher = regex.matcher(userInput);
@@ -92,8 +101,8 @@ public class Authenticator extends DataManager {
         return userInput;
     }
 
-    private Date parseDate(String target) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("MM/yy");
+    private Date parseDate(String target,String targetDateFormat) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat(targetDateFormat);
         Date date = null;
         try {
             date = dateFormat.parse(target);
@@ -113,7 +122,7 @@ public class Authenticator extends DataManager {
         String cvv = validateInput(Integer.toString(pin), "^\\d{3}$",
                 "Please enter a valid CVV, make sure to enter a 3-digit code from the back of your card: ", scanner);
         pin = Integer.parseInt(cvv);
-        Date expDate = parseDate(date);
+        Date expDate = parseDate(date,"MM/yy");
         user.setUserCard(cardNumber, expDate, pin);
         uploadData();
     }
@@ -172,8 +181,10 @@ public class Authenticator extends DataManager {
     protected void uploadData() {
         List<String> userLines = new ArrayList<>();
         List<String> cardLines = new ArrayList<>();
+        List<String> orderLines = new ArrayList<>();
         userLines.add("Name,Email,Password,Address\n");
         cardLines.add("Email,Card Number,Expiry Date,CVV\n");
+        orderLines.add("Email,Order ID,Quantity/ProductID,Total Price,Shipping Address,Date\n");
         for (Map.Entry<String, User> entry : users.entrySet()) {
             User user = entry.getValue();
             String name = user.getUserInfo().getName();
@@ -185,12 +196,33 @@ public class Authenticator extends DataManager {
 
             if (user.getUserCard() != null) {
                 String cardNumber = user.getUserCard().getCardNumber();
-                String expDate = (user.getUserCard().getDate().getMonth() + 1) + "/" + (user.getUserCard().getDate().getYear() - 100);
+                String expDate = (user.getUserCard().getDate().getMonth() + 1) + "/"
+                        + (user.getUserCard().getDate().getYear() - 100);
                 int pin = user.getUserCard().getPin();
                 String cardLine = String.format("%s,%s,%s,%s\n", email, cardNumber, expDate, pin);
                 cardLines.add(cardLine);
             }
+            if (!user.getPrevOrders().getOrders().isEmpty()) {
+                for (Order prevOrders : user.getPrevOrders().getOrders()) {
+                    int orderID = prevOrders.getID();
+                    String orderDetails = "";
+                    for (Map.Entry<Product, Integer> item : prevOrders.getProducts().entrySet()) {
+                        int productQuantity = item.getValue();
+                        int productID = item.getKey().getID();
+                        orderDetails += productQuantity + "|" + productID + "/";
+                    }
+                    Double totalPrice = prevOrders.getTotalPrice();
+                    String shipAddress = prevOrders.getShipAddress();
+                    String shipDate = (prevOrders.getDate().getYear() + 1900) + "-" + (prevOrders.getDate().getMonth() + 1) + "-"
+                            + (prevOrders.getDate().getDay() + 7);
+                    System.out.println(shipDate);
+                    String orderLine = String.format("%s,%s,%s,%s,%s,%s\n", email, orderID, orderDetails, totalPrice,
+                            shipAddress, shipDate);
+                    orderLines.add(orderLine);
+                }
+            }
         }
+        saveToFile(System.getProperty("user.dir") + "/src/UserData/orders.csv", orderLines);
         saveToFile(System.getProperty("user.dir") + "/src/UserData/users.csv", userLines);
         saveToFile(System.getProperty("user.dir") + "/src/UserData/cards.csv", cardLines);
     }
@@ -200,8 +232,10 @@ public class Authenticator extends DataManager {
         List<String> userLines = readFromFile(System.getProperty("user.dir") + "/src/UserData/users.csv");
         List<String> adminLines = readFromFile(System.getProperty("user.dir") + "/src/UserData/admins.csv");
         List<String> cardLines = readFromFile(System.getProperty("user.dir") + "/src/UserData/cards.csv");
+        List<String> orderLines = readFromFile(System.getProperty("user.dir") + "/src/UserData/orders.csv");
         users = new HashMap<String, User>();
         admins = new HashMap<String, Admin>();
+        
         for (String line : userLines) {
             String[] data = line.split(",", 4);
             String name = data[0];
@@ -212,14 +246,38 @@ public class Authenticator extends DataManager {
             User user = new User(info);
             users.put(info.getEmail(), user);
         }
-
+        for (String line : orderLines) {
+            String[] data = line.split(",", 6);
+            String email = data[0];
+            int orderID = Integer.parseInt(data[1]);
+            String[] orderDetails = data[2].split("/");
+            HashMap<Product,Integer> orderProducts = new HashMap<Product,Integer>();
+            for (String items : orderDetails) {
+                String[] item = items.split("\\|");
+                
+                int quantity = Integer.parseInt(item[0]);
+                int productID = Integer.parseInt(item[1]);
+                for (Product product : inventory.getProducts()) {
+                    if (productID == product.getID()) {
+                        orderProducts.put(product, quantity);
+                        break;
+                    }
+                }
+            }
+            double totalPrice = Double.parseDouble(data[3]);
+            String shippingAddress = data[4];
+            Date shipDate = parseDate(data[5],"YYY-MM-DD");
+            Order prevOrder = new Order(totalPrice, shipDate, shippingAddress, orderProducts);
+            prevOrder.setID(orderID);
+            users.get(email).getPrevOrders().addOrder(prevOrder);
+        }
         for (String line : cardLines) {
             String[] data = line.split(",", 4);
             String email = data[0];
             String cardNumber = data[1];
             String expDate = data[2];
             int pin = Integer.parseInt(data[3]);
-            Date date = parseDate(expDate);
+            Date date = parseDate(expDate,"MM/yy");
             users.get(email).setUserCard(cardNumber, date, pin);
         }
         for (String line : adminLines) {
@@ -233,5 +291,10 @@ public class Authenticator extends DataManager {
             admins.put(info.getEmail(), admin);
         }
 
+    }
+
+    @Override
+    public void onCheckout() {
+        uploadData();
     }
 }

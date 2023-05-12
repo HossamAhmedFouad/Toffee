@@ -1,11 +1,11 @@
-Name,Price,Category,Brand,Unit Type,Quantity
-Molten Cake,150.0,Cakes,Baskin-Robins,unit,0
-Orange Cake,110.0,Cakes,Baskin-Robins,unit,12
-Brownies,90.0,Cakes,Froster,unit,5
-Cookies,20.0,Pastries,Monginis,unit,10
-Candy,13.0,Sweets,Nestle,unit,29
-Apple Pie,113.0,Pastries,Nestle,unit,20
-Biscuits,20.0,Pastries,Baskin-Robins,unit,20
-Ice Cream,37.0,Frozen,Baskin-Robins,unit,43
-Cheese Cake,140.0,Cake,EL ABD, unit,19
-Manga,0.999,Manga,Manga,Manga,365
+ID,Name,Price,Category,Brand,Unit Type,Quantity
+1,Molten Cake,150.0,Cakes,Baskin-Robins,unit,0
+2,Orange Cake,110.0,Cakes,Baskin-Robins,unit,0
+3,Brownies,90.0,Cakes,Froster,unit,0
+4,Cookies,20.0,Pastries,Monginis,unit,0
+5,Candy,13.0,Sweets,Nestle,unit,23
+6,Apple Pie,113.0,Pastries,Nestle,unit,19
+7,Biscuits,20.0,Pastries,Baskin-Robins,unit,18
+8,Ice Cream,37.0,Frozen,Baskin-Robins,unit,42
+9,Cheese Cake,140.0,Cake,EL ABD, unit,19
+10,Manga,0.999,Manga,Manga,Manga,365

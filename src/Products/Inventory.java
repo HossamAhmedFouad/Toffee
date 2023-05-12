@@ -8,6 +8,7 @@ import UserData.DataManager;
 import UserData.Voucher;
 
 public class Inventory extends DataManager implements CartObserver{
+
     private List<Product> products;
     private List<Voucher> vouchers;
     private int loyalty = 20;
@@ -81,16 +82,18 @@ public class Inventory extends DataManager implements CartObserver{
     protected void uploadData() {
         List<String> productLines = new ArrayList<>();
         List<String> voucherLines = new ArrayList<>();
-        productLines.add("Name,Price,Category,Brand,Unit Type,Quantity\n");
+        productLines.add("ID,Name,Price,Category,Brand,Unit Type,Quantity\n");
         voucherLines.add("Code,Amount\n");
         for (Product product : products) {
+            int id = product.getID();
+            System.out.println(id);
             String name = product.getName();
             Double price = product.getPrice();
             String category = product.getCategory();
             String brand = product.getBrand();
             String unitType = product.getUnitType();
             int quantity = product.getQuantity();
-            String line = String.format("%s,%s,%s,%s,%s,%s\n", name, price, category, brand, unitType, quantity);
+            String line = String.format("%s,%s,%s,%s,%s,%s,%s\n", id, name, price, category, brand, unitType, quantity);
             productLines.add(line);
         }
         for (Voucher voucher : vouchers) {
@@ -111,14 +114,16 @@ public class Inventory extends DataManager implements CartObserver{
         products = new ArrayList<Product>();
         vouchers = new ArrayList<Voucher>();
         for (String line : productLines) {
-            String[] data = line.split(",", 7);
-            String name = data[0];
-            Double price = Double.parseDouble(data[1]);
-            String category = data[2];
-            String brand = data[3];
-            String unitType = data[4];
-            int quantity = Integer.parseInt(data[5]);
+            String[] data = line.split(",", 8);
+            int id = Integer.parseInt(data[0]);
+            String name = data[1];
+            Double price = Double.parseDouble(data[2]);
+            String category = data[3];
+            String brand = data[4];
+            String unitType = data[5];
+            int quantity = Integer.parseInt(data[6]);
             Product product = new Product(name, price, category, brand, unitType, quantity);
+            product.setID(id);
             products.add(product);
         }
     

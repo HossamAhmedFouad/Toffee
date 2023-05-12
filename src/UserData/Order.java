@@ -6,17 +6,17 @@ import java.util.Date;
 import java.util.HashMap;
 
 public class Order {
-
+    private static int id = 0;
+    private int orderID;
     private double totalPrice;
     private Date date;
     private String shipAddress;
     private HashMap<Product,Integer> products;
-
     private double discount;
-
-
     
-    public Order(double totalPrice, Date date, String shipAddress, HashMap<Product,Integer>  products) {
+    public Order(double totalPrice, Date date, String shipAddress, HashMap<Product, Integer> products) {
+        this.id++;
+        orderID = id;
         this.totalPrice = totalPrice;
         this.date = date;
         this.shipAddress = shipAddress;
@@ -24,6 +24,12 @@ public class Order {
         discount = 0;
     }
 
+    public int getID() {
+        return orderID;
+    }
+    public void setID(int id) {
+        orderID = id;
+    }
     public Order(Order other){
         this.totalPrice = other.totalPrice;
         this.date = other.date;
@@ -76,7 +82,7 @@ public class Order {
         double subTotal = totalPrice;
         int items=0;
         double deliveryFee = 20;
-        double orderTotal = subTotal + deliveryFee-discount;
+        double orderTotal = subTotal + deliveryFee - discount;
         for (Product product : products.keySet()) {
             items+=products.get(product);
         }

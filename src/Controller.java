@@ -5,6 +5,7 @@ import Products.Inventory;
 import UserData.*;
 
 import java.sql.Date;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Scanner;
@@ -203,7 +204,10 @@ public class Controller {
         if (authenticator.validateUser(info) && authenticator.validateUserPass(info)) {
             loggedUser = true;
             activeUser = authenticator.getUser(info);
-            activeUser.getUserCart().setObserver(inventory);
+            List<CartObserver> observers = new ArrayList<>(); 
+            observers.add(authenticator);
+            observers.add(inventory);
+            activeUser.getUserCart().setObservers(observers);
             System.out.println("Login Has Been Successful, Welcome " + activeUser.getUserInfo().getName());
         } else {
             System.out.println("Invalid Credentials");
@@ -249,7 +253,7 @@ public class Controller {
         if (choice == 1) {
             payment = new CashOnDelivery(order, activeUser);
         } else if (choice == 2) {
-            payment = new Ewallet(order, activeUser);
+            payment = new Ewallet(order, activeUser, authenticator);
         }else if (choice == 3) {
             return;
         }

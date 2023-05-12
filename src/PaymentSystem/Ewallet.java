@@ -8,9 +8,9 @@ import UserData.User;
 
 public class Ewallet extends Payment {
     Authenticator authenticator;
-    public Ewallet(Order order, User user) {
+    public Ewallet(Order order, User user, Authenticator authenticator) {
         super(order, user);
-        authenticator = new Authenticator();
+        this.authenticator = authenticator;
     }
 
     @Override

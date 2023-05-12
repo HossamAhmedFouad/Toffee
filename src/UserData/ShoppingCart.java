@@ -5,11 +5,12 @@ import Products.Availability;
 import Products.Product;
 
 import java.util.HashMap;
+import java.util.List;
 
 public class ShoppingCart {
     private HashMap<Product,Integer> products = new HashMap<Product, Integer>();
-    private double totalPrice=0;
-    private CartObserver observer;
+    private double totalPrice = 0;
+    private List<CartObserver> observers;
     public HashMap<Product, Integer> getProducts() {
         return products;
     }
@@ -22,8 +23,8 @@ public class ShoppingCart {
         }
     }
     
-    public void setObserver(CartObserver observer) {
-        this.observer = observer;
+    public void setObservers(List<CartObserver> observers) {
+        this.observers = observers;
     }
     
     public double getTotalPrice() {
@@ -83,7 +84,7 @@ public class ShoppingCart {
     public void emptyCart(){
         products.clear();
         totalPrice = 0;
-        if (observer != null) {
+        for (CartObserver observer : observers) {
             observer.onCheckout();
         }
     }

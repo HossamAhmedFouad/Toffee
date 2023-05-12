@@ -3,10 +3,10 @@ import UserData.Authenticator;
 
 public class Main {
     public static void main(String[] args) {
-        Controller controller = new Controller(new Inventory(),new Authenticator());
+        Inventory inventory = new Inventory();
+        Authenticator.setInventory(inventory);
+        Authenticator auth = new Authenticator();
+        Controller controller = new Controller(inventory, auth);
         controller.start();
-        controller = null;
-        System.gc();
-//        System.out.println(System.getProperty("user.dir"));
     }
 }
