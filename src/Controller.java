@@ -107,7 +107,7 @@ public class Controller {
             System.out.println("2 - Update Catalog");
             System.out.println("3 - Update Product");
             System.out.println("4 - View Orders");
-            System.out.println("5 - Suspend a User");
+            System.out.println("5 - Change User Status");
             System.out.println("6 - View Statistics");
             System.out.println("7 - Exit");
         }
@@ -205,13 +205,13 @@ public class Controller {
         if (authenticator.validateUser(info) && authenticator.validateUserPass(info)) {
             loggedUser = true;
             activeUser = authenticator.getUser(info);
-            List<CartObserver> observers = new ArrayList<>(); 
+            List<Observer> observers = new ArrayList<>(); 
             observers.add(authenticator);
             observers.add(inventory);
             activeUser.getUserCart().setObservers(observers);
             System.out.println("Login Has Been Successful, Welcome " + activeUser.getUserInfo().getName());
         } else {
-            System.out.println("Invalid Credentials");
+            System.out.println("Invalid Credentials, Either The Password Is Incorrect Or Account Is Suspended");
         }
     }
 
@@ -307,7 +307,6 @@ public class Controller {
     }
 
     private void prevOrders(){
-        //TODO: initiate Re-ordering previous order
         if (activeUser.getPrevOrders().getOrders().size() == 0) {
             System.out.println("There Are No Previous Orders");
             return;
@@ -432,8 +431,9 @@ public class Controller {
                         admin.updateProduct();
                     }else if(choice==4){
                         //TODO: View All Order
+                        admin.viewAllOrders();
                     }else if(choice==5){
-                        admin.suspendUser();
+                        admin.changeUserStatus();
                     }else if(choice==6){
                         //TODO: View Statistics
                     }else if(choice==7){

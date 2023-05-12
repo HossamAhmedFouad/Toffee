@@ -19,7 +19,7 @@ import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
-public class Authenticator extends DataManager implements CartObserver {
+public class Authenticator extends DataManager implements Observer {
 
     private static Inventory inventory;
 
@@ -141,11 +141,11 @@ public class Authenticator extends DataManager implements CartObserver {
     }
     
     public boolean validateUserPass(Info info) {
-        return users.get(info.getEmail()).getUserInfo().getPassword().equals(info.getPassword());
+        return users.get(info.getEmail()).getUserInfo().getPassword().equals(info.getPassword())
+                && users.get(info.getEmail()).isAccountActive();
     }
-
-
-    public void validation(Info info){
+    
+    private void validation(Info info){
         scanner = new Scanner(System.in);
         if (info.getName() != null && info.getAddress() != null) {
             // Validate name
@@ -168,7 +168,7 @@ public class Authenticator extends DataManager implements CartObserver {
     }
 
     public boolean validateUser(Info info) {
-        validation(info);
+        validation(info); //Regex
         return users.containsKey(info.getEmail());
     }
 
@@ -182,7 +182,7 @@ public class Authenticator extends DataManager implements CartObserver {
         List<String> userLines = new ArrayList<>();
         List<String> cardLines = new ArrayList<>();
         List<String> orderLines = new ArrayList<>();
-        userLines.add("Name,Email,Password,Address\n");
+        userLines.add("Name,Email,Password,Address,Status\n");
         cardLines.add("Email,Card Number,Expiry Date,CVV\n");
         orderLines.add("Email,Order ID,Quantity/ProductID,Total Price,Shipping Address,Date\n");
         SimpleDateFormat orderDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
@@ -193,7 +193,8 @@ public class Authenticator extends DataManager implements CartObserver {
             String email = user.getUserInfo().getEmail();
             String password = user.getUserInfo().getPassword();
             String address = user.getUserInfo().getAddress();
-            String line = String.format("%s,%s,%s,%s\n", name, email, password, address);
+            boolean status = user.isAccountActive();
+            String line = String.format("%s,%s,%s,%s,%s\n", name, email, password, address, status);
             userLines.add(line);
 
             if (user.getUserCard() != null) {
@@ -215,8 +216,6 @@ public class Authenticator extends DataManager implements CartObserver {
                     Double totalPrice = prevOrders.getTotalPrice();
                     String shipAddress = prevOrders.getShipAddress();
                     String shipDate = orderDateFormat.format(prevOrders.getDate());
-                    // String shipDate = (prevOrders.getDate().getYear() + 1900) + "-" + (prevOrders.getDate().getMonth() + 1) + "-"
-                    //         + (prevOrders.getDate().getDay() + 7);
                     String orderLine = String.format("%s,%s,%s,%s,%s,%s\n", email, orderID, orderDetails, totalPrice,
                             shipAddress, shipDate);
                     orderLines.add(orderLine);
@@ -238,13 +237,15 @@ public class Authenticator extends DataManager implements CartObserver {
         admins = new HashMap<String, Admin>();
         
         for (String line : userLines) {
-            String[] data = line.split(",", 4);
+            String[] data = line.split(",", 5);
             String name = data[0];
             String email = data[1];
             String password = data[2];
             String address = data[3];
+            boolean status = Boolean.parseBoolean(data[4]);
             Info info = new Info(name, email, password, address);
             User user = new User(info);
+            user.setStatus(status);
             users.put(info.getEmail(), user);
         }
         for (String line : orderLines) {
@@ -285,13 +286,13 @@ public class Authenticator extends DataManager implements CartObserver {
             String password = data[2];
             String address = data[3];
             Info info = new Info(name, email, password, address);
-            Admin admin = new Admin(info);
+            Admin admin = new Admin(info,this);
             admins.put(info.getEmail(), admin);
         }
     }
 
     @Override
-    public void onCheckout() {
+    public void onUpdate() {
         uploadData();
     }
 }

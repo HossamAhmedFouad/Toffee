@@ -40,7 +40,7 @@ public class User{
         return accountActive;
     }
 
-    public void setAccountActive(boolean accountActive) {
+    public void setStatus(boolean accountActive) {
         this.accountActive = accountActive;
     }
 

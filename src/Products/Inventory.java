@@ -3,11 +3,11 @@ package Products;
 import java.util.ArrayList;
 import java.util.List;
 
-import UserData.CartObserver;
+import UserData.Observer;
 import UserData.DataManager;
 import UserData.Voucher;
 
-public class Inventory extends DataManager implements CartObserver{
+public class Inventory extends DataManager implements Observer{
 
     private List<Product> products;
     private List<Voucher> vouchers;
@@ -20,13 +20,13 @@ public class Inventory extends DataManager implements CartObserver{
 
     public void removeProduct(Product product){
         if(products.isEmpty()) return;
-        products.removeIf(x -> x.getName().equals(product.getName()));
+        products.removeIf(x -> x.getID() == product.getID());
         uploadData();
     }
 
     public void editProduct(Product old, Product edit){
         if(products.isEmpty()) return;
-        products.removeIf(x -> x.getName().equals(old.getName()));
+        products.removeIf(x -> x.getID() == old.getID());
         products.add(edit);
         uploadData();
     }
@@ -114,7 +114,6 @@ public class Inventory extends DataManager implements CartObserver{
         vouchers = new ArrayList<Voucher>();
         for (String line : productLines) {
             String[] data = line.split(",", 8);
-            int id = Integer.parseInt(data[0]);
             String name = data[1];
             Double price = Double.parseDouble(data[2]);
             String category = data[3];
@@ -124,7 +123,6 @@ public class Inventory extends DataManager implements CartObserver{
             Product product = new Product(name, price, category, brand, unitType, quantity);
             products.add(product);
         }
-    
         for (String line : voucherLines) {
             String[] data = line.split(",", 2);
             String code = data[0];
@@ -142,7 +140,7 @@ public class Inventory extends DataManager implements CartObserver{
     }
 
     @Override
-    public void onCheckout() {
+    public void onUpdate() {
         uploadData();
     }
 

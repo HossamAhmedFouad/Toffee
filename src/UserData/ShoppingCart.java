@@ -11,7 +11,7 @@ import java.util.Map;
 public class ShoppingCart {
     private HashMap<Product,Integer> products = new HashMap<Product, Integer>();
     private double totalPrice = 0;
-    private List<CartObserver> observers;
+    private List<Observer> observers;
     public HashMap<Product, Integer> getProducts() {
         return products;
     }
@@ -26,7 +26,7 @@ public class ShoppingCart {
         return true;
     }
     
-    public void setObservers(List<CartObserver> observers) {
+    public void setObservers(List<Observer> observers) {
         this.observers = observers;
     }
     
@@ -88,8 +88,8 @@ public class ShoppingCart {
     public void emptyCart(){
         products.clear();
         totalPrice = 0;
-        for (CartObserver observer : observers) {
-            observer.onCheckout();
+        for (Observer observer : observers) {
+            observer.onUpdate();
         }
     }
 

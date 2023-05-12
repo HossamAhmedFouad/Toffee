@@ -6,18 +6,20 @@ import Products.Product;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
-public class Admin {
+public class Admin{
 
     private Info info;
     private Inventory inventory;
     private Authenticator authenticator;
+    private Scanner scanner = new Scanner(System.in);
+    private Observer observer;
 
     public Info getInfo() {
         return info;
     }
-
     public void setInfo(Info info) {
         this.info = info;
     }
@@ -38,14 +40,9 @@ public class Admin {
         this.authenticator = authenticator;
     }
 
-    private Scanner scanner;
-
-
-
-
-
-    public Admin(Info info){
+    public Admin(Info info, Observer observer){
         this.info = info;
+        this.observer = observer;
     }
 
     Product loadProduct(){
@@ -76,7 +73,6 @@ public class Admin {
     }
 
     public void updateCatalog(){
-        scanner = new Scanner(System.in);
         int choice;
         while (true){
             System.out.println("PLEASE CHOOSE AN OPTION");
@@ -91,7 +87,8 @@ public class Admin {
                 inventory.display();
                 System.out.println("Select Product ID To Delete");
                 choice = scanner.nextInt();
-                if(choice>0 && choice<=inventory.getProducts().size()) inventory.getProducts().remove(choice-1);
+                Product product = inventory.getProducts().get(choice - 1);
+                if(choice>0 && choice<=inventory.getProducts().size()) inventory.removeProduct(product);
                 break;
             }else if(choice==3){
                 break;
@@ -105,7 +102,6 @@ public class Admin {
         System.out.println("Select Product ID To Update");
         int choice = scanner.nextInt();
         if(choice>0 && choice<=inventory.getProducts().size()) inventory.editProduct(inventory.getProducts().get(choice-1),loadProduct());
-
     }
 
     public void updateLoyaltyVal(int val){
@@ -113,22 +109,48 @@ public class Admin {
     }
 
     public void viewAllOrders(){
-        //TODO: display all orders from CSV file
+        for (Map.Entry<String, User> entry : authenticator.getUsers().entrySet()) {
+            User user = entry.getValue();
+            System.out.println("User: " + user.getUserInfo().getName());
+            System.out.println("Email: " + user.getUserInfo().getEmail());
+            System.out.println("-------------------------");
+        
+            if (!user.getPrevOrders().getOrders().isEmpty()) {
+                for (Order prevOrder : user.getPrevOrders().getOrders()) {
+                    prevOrder.displaySummary();
+                }
+            }
+            System.out.println();
+        }
     }
 
-    public void suspendUser(){
+    public void changeUserStatus(){
         int idx = 1;
         List<String> mails = new ArrayList<>();
-        for(User usr : authenticator.getUsers().values()){
-            System.out.println(idx + " " + usr.getUserInfo().getName() + " " + usr.getUserInfo().getEmail());
+        for (User usr : authenticator.getUsers().values()) {
+            String formattedOutput = String.format("%-5s %-20s %s", idx, usr.getUserInfo().getName(), usr.getUserInfo().getEmail());
+            System.out.println(formattedOutput);
             mails.add(usr.getUserInfo().getEmail());
             idx++;
-        }
-        System.out.println("Please Select A User to suspend");
+        }        
+        System.out.println("Please Select A User");
         int choice = scanner.nextInt();
-        authenticator.getUsers().get(mails.get(choice-1)).setAccountActive(false);
+        if (choice <= 0 || choice > mails.size()) {
+            System.out.println("Error: Invalid Index");
+            return;
+        }
+        boolean userStatus = authenticator.getUsers().get(mails.get(choice - 1)).isAccountActive();
+        if (userStatus) {
+            System.out.println("Do you want to suspend? " + mails.get(choice - 1) + " (Y/N)");
+        } else {
+            System.out.println("Do you want to unsuspend? " + mails.get(choice - 1) + " (Y/N)");
+        }
+        scanner.nextLine();
+        String ans = scanner.nextLine();
+        if(ans.equals("N")) {
+            return;
+        }
+        authenticator.getUsers().get(mails.get(choice - 1)).setStatus(!userStatus);
+        observer.onUpdate();
     }
-
-
-
 }

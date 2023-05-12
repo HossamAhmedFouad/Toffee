@@ -31,7 +31,7 @@ public class PreviousOrders {
 
     public void viewOrders(){
         for(int i=1;i<=orders.size();i++){
-            System.out.println("==========ORDER ID " + i + " ===============");
+            System.out.println("========== ORDER ID " + i + " ===============");
             orders.get(i-1).displaySummary();
             System.out.println("====================================");
         }
