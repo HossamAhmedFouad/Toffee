@@ -85,7 +85,8 @@ public class Controller {
             return;
         }
         int otp = Authenticator.generateOTP();
-        Authenticator.SendOTP(info.getEmail(), otp);
+        if (!Authenticator.SendOTP(info.getEmail(), otp)) 
+            return;
         System.out.println("Please Enter OTP Sent To Your Email Address: " + info.getEmail());
         String input = scanner.nextLine();
         while(!input.equals(Integer.toString(otp))) {

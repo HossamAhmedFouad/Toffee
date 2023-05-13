@@ -87,7 +87,7 @@ public class Authenticator extends DataManager implements Observer {
         System.out.println("Please wait while sending OTP to your email address.....");
         String host = "smtp.gmail.com";
         String username = "fcaitoffeeshopwork@gmail.com";
-        String password = "ppvjxavkmrcpmtvk";
+        String password = "emhmkmcmdauwtmjs";
         Properties props = new Properties();
         props.put("mail.smtp.auth", "true");
         props.put("mail.smtp.starttls.enable", "true");
