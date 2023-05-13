@@ -1,3 +1,5 @@
+package Application;
+
 import Products.Inventory;
 import UserData.Authenticator;
 

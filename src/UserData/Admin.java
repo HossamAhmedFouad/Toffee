@@ -63,7 +63,7 @@ public class Admin{
      *
      * @return the loaded product
      */
-    Product loadProduct(){
+    private Product loadProduct(){
         String name,category,brand,unitType;
         double price,discountPercentage;
         Availability status = Availability.onSale;

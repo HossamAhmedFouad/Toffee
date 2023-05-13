@@ -1,9 +1,9 @@
 ID,Name,Price,Category,Brand,Unit Type,Quantity,Discount Percentage,Availability
-1,Chocolate Cake,20.1,Cake,Chocolala,kg,10,5.0,onSale
-2,Orange Cake,110.0,Cakes,Baskin-Robins,unit,10,0.0,notOnSale
+1,Chocolate Cake,20.1,Cake,Chocolala,kg,8,5.0,onSale
+2,Orange Cake,110.0,Cakes,Baskin-Robins,unit,9,0.0,notOnSale
 3,Konafa Bel Manga,40.5,Konafa,El Abd,unit,0,10.0,outOfStock
 4,Cookies,20.0,Pastries,Monginis,unit,12,10.0,onSale
-5,Candy,13.0,Sweets,Nestle,unit,21,10.0,onSale
+5,Candy,13.0,Sweets,Nestle,unit,20,10.0,onSale
 6,Apple Pie,113.0,Pastries,Nestle,unit,14,10.0,onSale
 7,Biscuits,20.0,Pastries,Baskin-Robins,unit,16,10.0,onSale
 8,Ice Cream,37.0,Frozen,Baskin-Robins,unit,36,10.0,onSale

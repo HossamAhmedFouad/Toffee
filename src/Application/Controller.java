@@ -1,3 +1,5 @@
+package Application;
+
 import PaymentSystem.CashOnDelivery;
 import PaymentSystem.Ewallet;
 import PaymentSystem.Payment;
@@ -85,8 +87,13 @@ public class Controller {
             return;
         }
         int otp = Authenticator.generateOTP();
-        if (!Authenticator.SendOTP(info.getEmail(), otp)) 
+        if (!Authenticator.SendOTP(info.getEmail(), otp)) {
+            System.out.println("Continuing without otp");
+            authenticator.addUser(info);
+            System.out.println("Register Has Been Successful, You Can Login Now");
+            System.out.println("Returning Back To Main Menu...");
             return;
+        }
         System.out.println("Please Enter OTP Sent To Your Email Address: " + info.getEmail());
         String input = scanner.nextLine();
         while(!input.equals(Integer.toString(otp))) {
