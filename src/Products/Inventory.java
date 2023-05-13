@@ -11,22 +11,40 @@ import UserData.DataManager;
 import UserData.Info;
 import UserData.Voucher;
 
+/**
+ * The Inventory class manages the products and vouchers in the system.
+ * It extends the DataManager class and implements the Observer interface.
+ */
 public class Inventory extends DataManager implements Observer{
 
     private List<Product> products;
     private List<Voucher> vouchers;
     private static Authenticator authenticator;
     private int loyalty = 20;
-    
+    /**
+     * Adds a product to the inventory.
+     *
+     * @param product the product to add
+     */
     public void addProduct(Product product) {
         products.add(product);
         uploadData();
     }
     
-    public static void setAuthenticator(Authenticator auth) {
-        authenticator = auth;
+    /**
+     * Retrieves the instance of the Authenticator.
+     *
+     * @return The Authenticator instance.
+     */
+    public static Authenticator getAuthenticator() {
+        return authenticator;
     }
-    
+
+    /**
+     * Removes a product from the inventory.
+     *
+     * @param product the product to remove
+     */
     public void removeProduct(Product product){
         if(products.isEmpty()) return;
         products.removeIf(x -> x.getProductID() == product.getProductID());
@@ -34,6 +52,12 @@ public class Inventory extends DataManager implements Observer{
         uploadData();
     }
 
+    /**
+     * Edits a product in the inventory.
+     *
+     * @param old  the original product
+     * @param edit the modified product
+     */
     public void editProduct(Product old, Product edit){
         if (products.isEmpty())
             return;
@@ -44,10 +68,18 @@ public class Inventory extends DataManager implements Observer{
         uploadData();
     }
     
+    /**
+     * Returns the list of products in the inventory.
+     *
+     * @return the list of products
+     */
     public List<Product> getProducts() {
         return products;
     }
     
+    /**
+     * Displays the products in the inventory.
+     */
     public void display(){
         if(products.isEmpty()){
             System.out.println("There Are No Products");
@@ -68,15 +100,27 @@ public class Inventory extends DataManager implements Observer{
         }
     }
     
+    /**
+     * Returns the list of vouchers in the inventory.
+     *
+     * @return the list of vouchers
+     */
     public List<Voucher> getVouchers() {
         return vouchers;
     }
 
+    /**
+     * Removes a voucher from the inventory.
+     *
+     * @param idx the index of the voucher to remove
+     */
     public void removeVoucher(int idx) {
         vouchers.remove(idx);
         uploadData();
     }
-    
+    /**
+     * Uploads data to the inventory management system.
+     */
     @Override
     protected void uploadData() {
         List<String> productLines = new ArrayList<>();
@@ -118,7 +162,9 @@ public class Inventory extends DataManager implements Observer{
         saveToFile(System.getProperty("user.dir") + "/src/Products/stock.csv", productLines);
         saveToFile(System.getProperty("user.dir") + "/src/Products/vouchers.csv", voucherLines);
     }
-
+    /**
+     * Loads data from the inventory management system.
+     */
     @Override
     protected void loadData() {
         List<String> productLines = readFromFile(System.getProperty("user.dir") + "/src/Products/stock.csv");
@@ -148,7 +194,8 @@ public class Inventory extends DataManager implements Observer{
             product.setStatus(availability);
             products.add(product);
         }
-        authenticator.onLoad();
+        Authenticator.setInventory(this);
+        authenticator = new Authenticator();
         for (String line : voucherLines) {
             String[] data = line.split(",", 3);
             String email = data[0];
@@ -164,24 +211,27 @@ public class Inventory extends DataManager implements Observer{
             }
         }
     }
-
+    /**
+     * Returns the loyalty points of a user.
+     *
+     * @return loyalty points
+     */
     public int getLoyalty(){
         return loyalty;
     }
-
+    /**
+     * Sets the loyalty value.
+     *
+     * @param loyalty The loyalty value to set.
+     */
     public void setLoyalty(int loyalty){
         this.loyalty = loyalty;
     }
-
+    /**
+     * Called when data is updated.
+     */
     @Override
     public void onUpdate() {
         uploadData();
     }
-
-    @Override
-    public void onLoad() {
-        loadData();
-    }
-
-
 }

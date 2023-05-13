@@ -8,8 +8,8 @@
 
 5 - Admin Skills -- Hossam
 
-6 - Send Email OTP (Yarab) -- Adel
+6 - Send Email OTP (Yarab) -- Adel (Done) 
 
-7 - Clean The Code -- Adel
+7 - Clean The Code -- Adel (Almost Done)
 
-8 - Regex -- Adel
+8 - Regex -- Adel (Done)

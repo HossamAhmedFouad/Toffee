@@ -8,15 +8,30 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * The ShoppingCart class represents a shopping cart containing products.
+ * It provides methods to add, remove, and manage the products in the cart.
+ */
 public class ShoppingCart {
     private HashMap<Product,Integer> products = new HashMap<Product, Integer>();
     private double totalPrice = 0;
     private List<Observer> observers;
-    
+
+    /**
+     * Returns the products in the shopping cart.
+     *
+     * @return The products in the shopping cart.
+     */
     public HashMap<Product, Integer> getProducts() {
         return products;
     }
 
+    /**
+     * Sets the products in the shopping cart to the specified products.
+     *
+     * @param otherProducts The products to set in the shopping cart.
+     * @return true if the products were successfully set, false otherwise.
+     */
     public boolean setProducts(HashMap<Product, Integer> otherProducts) {
         for (Map.Entry<Product, Integer> entry : otherProducts.entrySet()) {
             if (!addProduct(entry.getKey(), entry.getValue())) {
@@ -26,19 +41,30 @@ public class ShoppingCart {
         this.products = otherProducts;
         return true;
     }
-    
+
+    /**
+     * Sets the observers for the shopping cart.
+     *
+     * @param observers The observers to set.
+     */
     public void setObservers(List<Observer> observers) {
         this.observers = observers;
     }
-    
+
+    /**
+     * Returns the total price of the products in the shopping cart.
+     *
+     * @return The total price of the products in the shopping cart.
+     */
     public double getTotalPrice() {
         return totalPrice;
     }
-    
-    public void setTotalPrice(double totalPrice) {
-        this.totalPrice = totalPrice;
-    }
 
+    /**
+     * Increases the quantity of a product in the shopping cart by 1.
+     *
+     * @param idx The index of the product to increase the quantity.
+     */
     public void increaseAmount(int idx) {
         if (idx < 1 || idx > products.size()) {
             System.out.println("INVALID ID");
@@ -52,9 +78,14 @@ public class ShoppingCart {
             idx--;
         }
     }
-    
+
+    /**
+     * Decreases the quantity of a product in the shopping cart by 1.
+     *
+     * @param idx The index of the product to decrease the quantity.
+     */
     public void decreaseAmount(int idx){
-        if(idx<1 || idx>products.size()){
+        if (idx < 1 || idx > products.size()) {
             System.out.println("INVALID ID");
             return;
         }
@@ -70,6 +101,11 @@ public class ShoppingCart {
         }
     }
 
+    /**
+     * Removes a product from the shopping cart.
+     *
+     * @param idx The index of the product to remove.
+     */
     public void removeProduct(int idx){
         if(idx<1 || idx>products.size()){
             System.out.println("INVALID ID");
@@ -86,6 +122,11 @@ public class ShoppingCart {
         }
     }
 
+    /**
+     * Empties the shopping cart.
+     * Clears the products and sets the total price to zero.
+     * Notifies the observers about the update.
+     */
     public void emptyCart(){
         products.clear();
         totalPrice = 0;
@@ -94,15 +135,26 @@ public class ShoppingCart {
         }
     }
 
+    /**
+     * Checks out the shopping cart using the specified payment method.
+     *
+     * @param payment The payment method to use for the checkout.
+     * @return true if the payment was successful, false otherwise.
+     */
     public boolean checkOut(Payment payment){
         if(payment.payOrder()){
-            //empty cart
             return true;
         }
         return false;
-        //TODO: checkout and empty cart
     }
 
+    /**
+     * Adds a product with the specified quantity to the shopping cart.
+     *
+     * @param product  The product to add to the shopping cart.
+     * @param quantity The quantity of the product to add.
+     * @return true if the product was successfully added, false otherwise.
+     */
     public boolean addProduct(Product product, int quantity) {
         if (product.getStatus() != Availability.outOfStock && product.getQuantity() - quantity >= 0) {
             product.setQuantity(product.getQuantity() - quantity);
@@ -113,7 +165,12 @@ public class ShoppingCart {
         totalPrice += (product.getPrice() * quantity);
         return true;
     }
-    //this two fun can put in controller instead of here
+
+    /**
+     * Displays the contents of the shopping cart.
+     * Prints the product details, quantity, and price for each item in the cart.
+     * If the cart is empty, it prints a message indicating so.
+     */
     public void display(){
         if(products.isEmpty()){
             System.out.println("Cart Is Empty");
@@ -128,6 +185,11 @@ public class ShoppingCart {
         System.out.format("\n%-25s $%-10.2f\n", "Total Price:", totalPrice);
     }
 
+    /**
+     * Checks if the shopping cart is empty.
+     *
+     * @return true if the shopping cart is empty, false otherwise.
+     */
     public boolean empty(){
         return products.isEmpty();
     }

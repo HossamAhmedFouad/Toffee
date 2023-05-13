@@ -11,25 +11,61 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Scanner;
 
+/**
+ * The Controller class manages the interaction between the user/admin and the Toffee Shop system.
+ * It handles user registration, login, menu display, cart management, order placement, and other related operations.
+ */
 public class Controller {
-    Scanner scanner;
-    int choice;
+    /**
+     * The scanner object used for user input.
+     */
+    private Scanner scanner;
+    /**
+     * The user's choice input.
+     */
+    private int choice;
+    /**
+     * The inventory object that stores the available products.
+     */
     private Inventory inventory;
+    /**
+     * The authenticator object for user authentication and authorization.
+     */
     private Authenticator authenticator;
+    /**
+     * Indicates whether a user is currently logged in.
+     */
     private boolean loggedUser;
+    /**
+     * The active user object.
+     */
     private User activeUser;
-
+    /**
+     * The admin object.
+     */
     private Admin admin;
-
+    /**
+     * Indicates whether an admin is currently logged in.
+     */
     private boolean loggedAdmin;
 
-
+    /**
+     * Constructs a new Controller instance with the given inventory and authenticator.
+     *
+     * @param inventory     the inventory object to be used
+     * @param authenticator the authenticator object to be used
+     */
     public Controller(Inventory inventory, Authenticator authenticator) {
         this.inventory = inventory;
         this.authenticator = authenticator;
         loggedUser = false;
     }
 
+    /**
+     * Handles the user registration process.
+     * Prompts the user to enter the required information and validates it.
+     * If the registration is successful, the user is added to the authenticator.
+     */
     private void register() {
         scanner.nextLine();
         String name, email, password, shippingAddress;
@@ -81,9 +117,12 @@ public class Controller {
         System.out.println("Register Has Been Successful, You Can Login Now");
         System.out.println("Returning Back To Main Menu...");
     }
-
+    /**
+     * Handles the change of cart items based on the given choice.
+     * @param choice the user's choice for cart item modification
+     */
     private void changeCartItems(int choice) {
-        System.out.println("PLEASE ENTER PRODUCT NUMBER");
+        System.out.println("Please Enter Product Number:");
         int id = scanner.nextInt();
         if (choice == 1) {
             activeUser.getUserCart().increaseAmount(id);
@@ -93,7 +132,9 @@ public class Controller {
             activeUser.getUserCart().removeProduct(id);
         }
     }
-
+    /**
+     * Displays the main menu based on the user/admin login status.
+     */
     private void displayMenu() {
         System.out.println("========== Welcome To Toffee Shop ==========");
         System.out.println("1 - View Catalog Of Products Available");
@@ -118,7 +159,9 @@ public class Controller {
         }
 
     }
-    
+    /**
+     * Updates the credit card information for the active user.
+     */
     private void updateCard() {
         if (activeUser.getUserCard() == null) {
             System.out.println("There Is No Credit Card In Your Account.");
@@ -140,13 +183,16 @@ public class Controller {
         authenticator.addCard(activeUser, cardNum, expDate, pin);
         System.out.println("Credit Card Was Updated");
     }
-    
+    /**
+     * Redeems a voucher for the given order.
+     * @param order the order for which the voucher is being redeemed
+     */
     private void redeemVoucher(Order order) {
         while (true) {
             if (activeUser.getUserCart().getTotalPrice() > 0 && !activeUser.getVouchers().isEmpty()) {
                     System.out.println("Available Vouchers:");
                     displayVouchers(activeUser.getVouchers(),true);
-                    System.out.println("PLEASE ENTER VOUCHER NUMBER: ");
+                    System.out.println("Please Enter Voucher Number: ");
                     choice = scanner.nextInt();
                     if(activeUser.getVouchers().get(choice-1).getAmount()>=activeUser.getUserCart().getTotalPrice()){
                         order.setDiscount(activeUser.getUserCart().getTotalPrice());
@@ -155,26 +201,30 @@ public class Controller {
                         order.setDiscount(activeUser.getVouchers().get(choice-1).getAmount());
                         activeUser.getVouchers().remove(choice - 1);
                     }
-                    System.out.println("DO YOU WANT TO REDEEM ANOTHER VOUCHER? (YES):(NO)");
+                    System.out.println("Do You Want to Redeem Another Voucher? (Yes):(No)");
                     String vAnswer = scanner.nextLine();
-                    if(vAnswer.equals("NO")){
+                    if(vAnswer.equals("No")){
                         break;
                     }
                     
             }else{
-                System.out.println("CANT ADD VOUCHER TO YOUR ORDER");
+                System.out.println("Cant Add Voucher to Your Order");
                 break;
             }
         }
     }
-
+    /**
+     * Takes the required user information for authentication.
+     *
+     * @return the Info object containing the user's email and password
+     */
     private Info takeInfo(){
         String email, password, input;
         scanner.nextLine();
-        System.out.print("Enter email: ");
+        System.out.print("Enter Email: ");
         input = scanner.nextLine();
         email = input;
-        System.out.print("Enter password: ");
+        System.out.print("Enter Password: ");
         input = scanner.nextLine();
         password = input;
         Info info = new Info();
@@ -182,7 +232,11 @@ public class Controller {
         info.setPassword(password);
         return info;
     }
-
+    /**
+     * Handles the user login process.
+     * Prompts the user to choose between user login and admin login.
+     * Validates the credentials and logs in the user/admin if they are valid.
+     */
     private void login(){
         while (true){
             System.out.println("Please Choice Option");
@@ -198,7 +252,11 @@ public class Controller {
             }
         }
     }
-
+    /**
+     * Handles the user login process.
+     * Prompts the user to enter their email and password.
+     * Validates the credentials and logs in the user if they are valid.
+     */
     private void loginUser() {
         Info info = takeInfo();
         if (authenticator.validateUser(info) && authenticator.validateUserPass(info)) {
@@ -213,7 +271,11 @@ public class Controller {
             System.out.println("Invalid Credentials, Either The Password Is Incorrect Or Account Is Suspended");
         }
     }
-
+    /**
+     * Handles the admin login process.
+     * Prompts the admin to enter their email and password.
+     * Validates the credentials and logs in the admin if they are valid.
+     */
     private void loginAdmin(){
         Info info = takeInfo();
         if (authenticator.validateAdmin(info) && authenticator.validateAdminPass(info)) {
@@ -226,24 +288,28 @@ public class Controller {
             System.out.println("Invalid Credentials");
         }
     }
-
-    private void checkOut(){
+    /**
+     * Checks out the user's cart by choosing a shipping address and payment option.
+     * Creates an order object and processes the payment.
+     * Offers the user the choice to redeem a voucher for the order if they have any.
+     * Updates the inventory and clears the user's cart.
+     */
+    private void checkOut() {
         //Choosing shipping address
         scanner.nextLine();
-        String address=null;
+        String address = null;
         System.out.println("PLEASE CHOOSE ADDRESS");
         System.out.println("1 - Same Account Address");
         System.out.println("2 - Add New Address");
         choice = scanner.nextInt();
         if (choice == 1) {
-            address=activeUser.getUserInfo().getAddress();
+            address = activeUser.getUserInfo().getAddress();
         } else if (choice == 2) {
             System.out.println("Enter A New Address");
             scanner.nextLine();
             address = scanner.nextLine();
         }
-        //Payment section
-        System.out.println("PLEASE CHOOSE PAYMENT OPTION");
+        System.out.println("Please Choose Payment Option");
         System.out.println("1 - Cash On Delivery");
         System.out.println("2 - Credit Card");
         System.out.println("3 - Back");
@@ -253,30 +319,31 @@ public class Controller {
             payment = new CashOnDelivery(activeUser);
         } else if (choice == 2) {
             payment = new Ewallet(activeUser, authenticator);
-        }else if (choice == 3) {
+        } else if (choice == 3) {
             return;
         }
         Date today = new Date(System.currentTimeMillis());
-        Order order = new Order(activeUser.getUserCart().getTotalPrice(), today,address, new HashMap<>(activeUser.getUserCart().getProducts()));
+        Order order = new Order(activeUser.getUserCart().getTotalPrice(), today, address,
+                new HashMap<>(activeUser.getUserCart().getProducts()));
         if (activeUser.getUserCart().checkOut(payment)) {
             scanner.nextLine();
-            while(true){
-                System.out.println("DO YOU WANT TO REDEEM (VOUCHER):(LOYALITYPOINTES):(EXIT) ");
-                String answer=scanner.nextLine();
-                if(answer.equals("VOUCHER")){
+            while (true) {
+                System.out.println("Do You Want to Redeem (Voucher):(Loyalty Points):(Exit) ");
+                String answer = scanner.nextLine();
+                if (answer.equals("Voucher")) {
                     redeemVoucher(order);
                     break;
-                }else if(answer.equals("LOYALITYPOINTES")){
+                } else if (answer.equals("Loyalty Points")) {
                     redeemLoyalty(order);
                     break;
-                }else if(answer.equals("EXIT")){
+                } else if (answer.equals("Exit")) {
                     break;
                 }
             }
             order.displaySummary();
-            System.out.println("DO YOU WANT TO CONFIRM? (YES):(NO)");
+            System.out.println("Do You Want to Confirm? (Yes):(No)");
             String cAnswer = scanner.nextLine();
-            if (cAnswer.equals("YES")) {
+            if (cAnswer.equals("Yes")) {
                 activeUser.getPrevOrders().addOrder(order);
                 activeUser.setLoyaltyPoints(calculateLoyaltyPoints(order.getTotalPrice()));
                 activeUser.getUserCart().emptyCart();
@@ -286,14 +353,25 @@ public class Controller {
             System.out.println("Error In Payment");
         }
     }
+    /**
+     * Calculates loyalty points based on the order total.
+     * 
+     * @param orderTotal the total amount of the order
+     * @return the calculated loyalty points
+     */
     public int calculateLoyaltyPoints(Double orderTotal) {
         int loyaltyPoints = 0;
         int dollarPerPoint = inventory.getLoyalty();
-        int intervals =  (int) (orderTotal / dollarPerPoint);
+        int intervals = (int) (orderTotal / dollarPerPoint);
         loyaltyPoints = intervals;
         System.out.println(loyaltyPoints);
         return loyaltyPoints;
     }
+    /**
+     * Redeems loyalty points for the given order.
+     * 
+     * @param order the order to redeem loyalty points for
+     */
     public void redeemLoyalty(Order order){
         int pointsPerDollar = inventory.getLoyalty();
         int loyaltyPoints=activeUser.getLoyaltyPoints();
@@ -304,7 +382,9 @@ public class Controller {
         }
         order.setDiscount(discountAmount);       
     }
-
+    /**
+     * Displays the user's previous orders and provides options to re-order or view order details.
+     */
     private void prevOrders(){
         if (activeUser.getPrevOrders().getOrders().size() == 0) {
             System.out.println("There Are No Previous Orders");
@@ -312,16 +392,16 @@ public class Controller {
         }
         activeUser.getPrevOrders().viewOrders();
         while (true){
-            System.out.println("PLEASE CHOOSE ACTION");
+            System.out.println("Please Choose Action");
             System.out.println("1 - Re-Order");
             System.out.println("2 - View Order Details");
             System.out.println("3 - Back");
             choice = scanner.nextInt();
             if(choice==1 || choice==2){
-                System.out.println("PLEASE CHOOSE ORDER ID");
+                System.out.println("Please Choose Order ID");
                 int id = scanner.nextInt();
                 if(id < 1 || id > activeUser.getPrevOrders().getOrders().size()){
-                    System.out.println("INVALID ID NUMBER");
+                    System.out.println("Invalid ID Number");
                 }else{
                     if (choice == 1) {
                         Order order = activeUser.getPrevOrders().getOrders().get(id - 1);
@@ -342,15 +422,17 @@ public class Controller {
         }
 
     }
-
+    /**
+     * Displays the contents of the user's cart and provides options to modify the items or proceed to checkout.
+     */
     private void viewCart() {
         activeUser.getUserCart().display();
         if (activeUser.getUserCart().empty()) 
             return;
         while (true) {
-            System.out.println("PLEASE CHOOSE ACTION");
-            System.out.println("1 - Increase amount");
-            System.out.println("2 - Decrease amount");
+            System.out.println("Please Choose Action");
+            System.out.println("1 - Increase Amount");
+            System.out.println("2 - Decrease Amount");
             System.out.println("3 - Remove Item");
             System.out.println("4 - Checkout");
             System.out.println("5 - Back");
@@ -365,10 +447,12 @@ public class Controller {
             }
         }
     }
-
+    /**
+     * Adds an item to the user's cart based on the item number.
+     */
     private void addItem() {
         scanner.nextLine();
-        System.out.println("PLEASE ENTER ITEM NUMBER: ");
+        System.out.println("Please Enter Item Number: ");
         choice = scanner.nextInt();
         if (choice <= 0 || choice > inventory.getProducts().size()) {
             System.out.println("Error: Invalid Index.");
@@ -380,7 +464,9 @@ public class Controller {
         }
         System.out.println(inventory.getProducts().get(choice - 1));
     }
-
+    /**
+     * Starts the application and handles user interactions.
+     */
     public void start() {
         scanner = new Scanner(System.in);
         while (true) {
@@ -389,10 +475,10 @@ public class Controller {
             if (choice == 1) {
                 inventory.display();
                 while (true) {
-                    System.out.println("PLEASE CHOOSE ACTION");
-                    System.out.println("1 - Add an item to cart");
-                    System.out.println("2 - Go to cart");
-                    System.out.println("3 - Buy a voucher");
+                    System.out.println("Please Choose Action:");
+                    System.out.println("1 - Add An Item To Cart");
+                    System.out.println("2 - Go To Cart");
+                    System.out.println("3 - Buy A Voucher");
                     System.out.println("4 - Go Back");
                     choice = scanner.nextInt();
                     if (loggedUser) {
@@ -429,7 +515,6 @@ public class Controller {
                     }else if(choice==3){
                         admin.updateProduct();
                     }else if(choice==4){
-                        //TODO: View All Order
                         admin.viewAllOrders();
                     }else if(choice==5){
                         admin.changeUserStatus();
@@ -448,11 +533,16 @@ public class Controller {
             }
         }
     }
-
+    /**
+     * Displays a list of vouchers with the option to view voucher codes or amounts.
+     * 
+     * @param vouchers    the list of vouchers to display
+     * @param displayCode flag indicating whether to display voucher codes or amounts
+     */
     private void displayVouchers(List<Voucher> vouchers,boolean displayCode) {
 
         if (vouchers.isEmpty()) {
-            System.out.println("No vouchers available.");
+            System.out.println("No Vouchers Available.");
             return;
         }
         int cnt = 1;
@@ -470,7 +560,9 @@ public class Controller {
             }
         }
     }
-    
+    /**
+     * Allows the user to buy a voucher from the available options.
+     */
     private void buyVoucher(){
         while(true){
             displayVouchers(inventory.getVouchers(),false);

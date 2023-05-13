@@ -8,16 +8,41 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-
+/**
+ * Abstract class for managing data by uploading and loading data to/from files.
+ */
 public abstract class DataManager {
+    /**
+     * Scanner object for reading input.
+     */
     protected Scanner scanner;
-    
+    /**
+     * FileWriter object for writing data.
+     */
     protected FileWriter myWriter;
-    
+
+    /**
+     * Constructs a DataManager object.
+     */
+    public DataManager() {
+        loadData();
+    }
+    /**
+     * Uploads the data to a file.
+     */
     protected abstract void uploadData();
-    
+
+    /**
+     * Loads the data from a file.
+     */
     protected abstract void loadData();
 
+    /**
+     * Saves the provided lines to the specified file path.
+     *
+     * @param filePath the file path to save the lines to
+     * @param lines the lines to be saved
+     */
     protected void saveToFile(String filePath, List<String> lines) {
         try {
             myWriter = new FileWriter(filePath);
@@ -31,6 +56,13 @@ public abstract class DataManager {
         }
     }
 
+    /**
+     * Reads lines from the specified file path.
+     *
+     * @param filePath the file path to read lines from
+     * @return a list of lines read from the file
+     * @throws RuntimeException if the file is not found
+     */
     protected List<String> readFromFile(String filePath) {
         List<String> lines = new ArrayList<>();
         try {
