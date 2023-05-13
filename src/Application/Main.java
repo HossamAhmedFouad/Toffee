@@ -13,6 +13,8 @@ public class Main {
      *
      * @param args The command-line arguments.
      */
+    /*Note: Email Authentication doesn't work on some devices, but works on others.
+    We don't know the reason so we added a way to bypass authentication if needed.*/
     public static void main(String[] args) {
         Inventory inventory = new Inventory();
         Authenticator auth = Inventory.getAuthenticator();

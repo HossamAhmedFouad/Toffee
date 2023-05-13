@@ -50,13 +50,14 @@ public class Authenticator extends DataManager implements Observer {
 
     public static boolean SendOTP(String email, int code) {
         String host = "smtp.gmail.com";
-        String username = "fcai.toffeeshop@gmail.com";
-        String password = "dfpzbhgihyfxtbjp";
-        Properties props = new Properties();
-        props.put("mail.smtp.auth", "true");
-        props.put("mail.smtp.starttls.enable", "true");
+        String username = "fcaitoffeeshopwork@gmail.com";
+        String password = "rcjoocygcysbmqpc";
+        Properties props = System.getProperties();
         props.put("mail.smtp.host", host);
-        props.put("mail.smtp.port", "587");
+        props.put("mail.smtp.port", "465");
+        props.put("mail.smtp.debug", "true");
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.ssl.enable", "true");
         Session session = Session.getInstance(props, new javax.mail.Authenticator() {
             protected PasswordAuthentication getPasswordAuthentication() {
                 return new PasswordAuthentication(username, password);
